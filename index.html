@@ -101,45 +101,47 @@
         <button type="button" onclick="sendData()">Отправить котировки в бот</button>
     </form>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-        const options = { day: 'numeric', month: 'long', year: 'numeric' };
-        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('ru-RU', options);
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    document.getElementById('currentDate').innerText = new Date().toLocaleDateString('ru-RU', options);
 
-        function switchTab(type) {
-            if (type === 'heavy') {
-                document.getElementById('tabHeavy').classList.add('active');
-                document.getElementById('tabLight').classList.remove('active');
-                document.getElementById('blockHeavy').classList.remove('hidden');
-                document.getElementById('blockLight').classList.add('hidden');
-            } else {
-                document.getElementById('tabLight').classList.add('active');
-                document.getElementById('tabHeavy').classList.remove('active');
-                document.getElementById('blockLight').classList.remove('hidden');
-                document.getElementById('blockHeavy').classList.add('hidden');
+    function switchTab(type) {
+        if (type === 'heavy') {
+            document.getElementById('tabHeavy').classList.add('active');
+            document.getElementById('tabLight').classList.remove('active');
+            document.getElementById('blockHeavy').classList.remove('hidden');
+            document.getElementById('blockLight').classList.add('hidden');
+        } else {
+            document.getElementById('tabLight').classList.add('active');
+            document.getElementById('tabHeavy').classList.remove('active');
+            document.getElementById('blockLight').classList.remove('hidden');
+            document.getElementById('blockHeavy').classList.add('hidden');
+        }
+    }
+
+    function sendData() {
+        const formData = {};
+        const inputs = document.querySelectorAll('input');
+        
+        inputs.forEach(input => {
+            // Собираем данные по input.id (убедись, что id у полей имеют вид типа heavy_MRM_3000)
+            if (input.value && input.id) {
+                formData[input.id] = parseFloat(input.value);
             }
+        });
+
+        if (Object.keys(formData).length === 0) {
+            alert("Пожалуйста, заполните хотя бы одну ставку.");
+            return;
         }
 
-        function sendData() {
-            const formData = {};
-            const inputs = document.querySelectorAll('input');
-            
-            inputs.forEach(input => {
-                if (input.value) {
-                    formData[input.id] = parseFloat(input.value);
-                }
-            });
-
-            if (Object.keys(formData).length === 0) {
-                alert("Пожалуйста, заполните хотя бы одну ставку.");
-                return;
-            }
- 
-            tg.sendData(JSON.stringify(formData));
-            tg.close();
-        }
-    </script>
+        // Отправляем данные в бот
+        tg.sendData(JSON.stringify(formData));
+        tg.close();
+    }
+</script>
 </body>
 </html>
