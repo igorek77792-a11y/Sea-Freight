@@ -105,34 +105,32 @@
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
-     // Надежное разделение интерфейса формы
+    // Железобетонное разделение формы для МОРЯ и БАРЖ
 const urlParams = new URLSearchParams(window.location.search);
-const brokerType = urlParams.get('type'); 
+const brokerType = urlParams.get('type');
 
 if (brokerType === 'sea') {
-    // Если зашел МОРСКОЙ брокер — полностью вырезаем заголовки и строки БАРЖ
-    document.querySelectorAll('.barge-title, .barge-row').forEach(el => {
-        el.style.display = 'none';
-    });
+    // Морской брокер: собираем ВСЕ элементы барж и скрываем их циклом for
+    var bargeTitles = document.getElementsByClassName('barge-title');
+    var bargeRows = document.getElementsByClassName('barge-row');
+    
+    for (var i = 0; i < bargeTitles.length; i++) {
+        bargeTitles[i].style.setProperty('display', 'none', 'important');
+    }
+    for (var j = 0; j < bargeRows.length; j++) {
+        bargeRows[j].style.setProperty('display', 'none', 'important');
+    }
 } else if (brokerType === 'barge') {
-    // Если зашел БАРЖЕВЫЙ брокер — полностью вырезаем заголовки и строки МОРЯ
-    document.querySelectorAll('.sea-title, .sea-row').forEach(el => {
-        el.style.display = 'none';
-    });
-}
-} else if (brokerType === 'barge') {
-    // Если открыл баржевик — скрываем блоки морских судов
-    document.querySelectorAll('.section-divider').forEach(el => {
-        if (el.innerText.includes('Морские суда')) {
-            el.style.display = 'none';
-            // Циклом скрываем все 11 морских портов, пока не дойдем до раздела барж
-            let next = el.nextElementSibling;
-            while (next && !next.classList.contains('section-divider')) {
-                next.style.style.display = 'none';
-                next = next.nextElementSibling;
-            }
-        }
-    });
+    // Баржевый брокер: собираем ВСЕ элементы моря и скрываем их циклом for
+    var seaTitles = document.getElementsByClassName('sea-title');
+    var seaRows = document.getElementsByClassName('sea-row');
+    
+    for (var k = 0; k < seaTitles.length; k++) {
+        seaTitles[k].style.setProperty('display', 'none', 'important');
+    }
+    for (var l = 0; l < seaRows.length; l++) {
+        seaRows[l].style.setProperty('display', 'none', 'important');
+    }
 }
 
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
