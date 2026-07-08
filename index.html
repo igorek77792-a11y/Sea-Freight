@@ -105,6 +105,34 @@
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
+      // Автоматическое разделение на МОРЕ и БАРЖИ
+const urlParams = new URLSearchParams(window.location.search);
+const brokerType = urlParams.get('type'); // получаем ?type=sea или ?type=barge
+
+if (brokerType === 'sea') {
+    // Если открыл морской брокер — скрываем блоки речных барж
+    document.querySelectorAll('.section-divider').forEach(el => {
+        if (el.innerText.includes('Речные баржи')) {
+            el.style.display = 'none';
+            // скрываем две следующие строки с баржами (CTZ и Ruse)
+            if (el.nextElementSibling) el.nextElementSibling.style.display = 'none';
+            if (el.nextElementSibling && el.nextElementSibling.nextElementSibling) el.nextElementSibling.nextElementSibling.style.display = 'none';
+        }
+    });
+} else if (brokerType === 'barge') {
+    // Если открыл баржевик — скрываем блоки морских судов
+    document.querySelectorAll('.section-divider').forEach(el => {
+        if (el.innerText.includes('Морские суда')) {
+            el.style.display = 'none';
+            // Циклом скрываем все 11 морских портов, пока не дойдем до раздела барж
+            let next = el.nextElementSibling;
+            while (next && !next.classList.contains('section-divider')) {
+                next.style.style.display = 'none';
+                next = next.nextElementSibling;
+            }
+        }
+    });
+}
 
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
     document.getElementById('currentDate').innerText = new Date().toLocaleDateString('ru-RU', options);
