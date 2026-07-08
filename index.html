@@ -105,20 +105,21 @@
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
-      // Автоматическое разделение на МОРЕ и БАРЖИ
+     // Надежное разделение интерфейса формы
 const urlParams = new URLSearchParams(window.location.search);
-const brokerType = urlParams.get('type'); // получаем ?type=sea или ?type=barge
+const brokerType = urlParams.get('type'); 
 
 if (brokerType === 'sea') {
-    // Если открыл морской брокер — скрываем блоки речных барж
-    document.querySelectorAll('.section-divider').forEach(el => {
-        if (el.innerText.includes('Речные баржи')) {
-            el.style.display = 'none';
-            // скрываем две следующие строки с баржами (CTZ и Ruse)
-            if (el.nextElementSibling) el.nextElementSibling.style.display = 'none';
-            if (el.nextElementSibling && el.nextElementSibling.nextElementSibling) el.nextElementSibling.nextElementSibling.style.display = 'none';
-        }
+    // Если зашел МОРСКОЙ брокер — полностью вырезаем заголовки и строки БАРЖ
+    document.querySelectorAll('.barge-title, .barge-row').forEach(el => {
+        el.style.display = 'none';
     });
+} else if (brokerType === 'barge') {
+    // Если зашел БАРЖЕВЫЙ брокер — полностью вырезаем заголовки и строки МОРЯ
+    document.querySelectorAll('.sea-title, .sea-row').forEach(el => {
+        el.style.display = 'none';
+    });
+}
 } else if (brokerType === 'barge') {
     // Если открыл баржевик — скрываем блоки морских судов
     document.querySelectorAll('.section-divider').forEach(el => {
