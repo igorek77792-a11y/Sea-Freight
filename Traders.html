@@ -282,26 +282,27 @@
             color: var(--text-main);
         }
 
+        /* Инвертированная логика цветов для трейдера: снижение ставки фрахта — это хорошо (зеленый) */
         .rate-up {
-            background-color: rgba(16, 185, 129, 0.12);
-            color: #059669;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .rate-down {
-            background-color: rgba(239, 68, 68, 0.12);
+            background-color: rgba(239, 68, 68, 0.12); /* Красный цвет для роста цены фрахта */
             color: #dc2626;
             border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
+        .rate-down {
+            background-color: rgba(16, 185, 129, 0.12); /* Зеленый цвет для падения цены фрахта */
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
         @media (prefers-color-scheme: dark) {
             .rate-up {
-                background-color: rgba(16, 185, 129, 0.18);
-                color: #34d399;
-            }
-            .rate-down {
                 background-color: rgba(239, 68, 68, 0.18);
                 color: #f87171;
+            }
+            .rate-down {
+                background-color: rgba(16, 185, 129, 0.18);
+                color: #34d399;
             }
         }
 
@@ -498,11 +499,11 @@
                         val = str.slice(0, -1);
                         if (lastChar === 'u') {
                             trend = '↑';
-                            style = 'rate-up';
+                            style = 'rate-up'; // Было 'rate-up' (зеленый), стало 'rate-up' (красный) — так как цена выросла
                         }
                         if (lastChar === 'd') {
                             trend = '↓';
-                            style = 'rate-down';
+                            style = 'rate-down'; // Было 'rate-down' (красный), стало 'rate-down' (зеленый) — так как цена снизилась
                         }
                     }
                     return { price: `$${val}`, trend, style };
@@ -643,4 +644,5 @@
         };
     </script>
 </body>
+</html>
 </html>
