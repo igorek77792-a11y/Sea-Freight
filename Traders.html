@@ -1,29 +1,51 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Freight Rates — Giurgiulești Hub</title>
     
     <style>
-        /* Премиальная светлая палитра: Белый фон, светло-синие и голубые акценты */
+        /* Premium color palette with system-aware light & dark themes */
         :root {
-            --bg-gradient-start: #f0f9ff; /* Нежно-голубой */
-            --bg-gradient-end: #e0f2fe;   /* Светло-синий */
-            --card-bg: #ffffff;           /* Белый */
-            --text-main: #0f172a;         /* Глубокий темно-синий */
-            --text-muted: #475569;        /* Серый slate */
-            --border-color: #cbd5e1;      /* Мягкая граница */
-            --tab-bg: #e2e8f0;            /* Фон переключателя */
-            --tab-active: #ffffff;        /* Активный переключатель */
-            --tab-active-text: #0284c7;   /* Цвет активного таба (Голубой) */
+            --bg-gradient-start: #f0f9ff; /* Soft sky blue */
+            --bg-gradient-end: #e0f2fe;   /* Light blue */
+            --card-bg: #ffffff;           /* Clean white */
+            --text-main: #0f172a;         /* Deep slate */
+            --text-muted: #475569;        /* Medium slate */
+            --border-color: #cbd5e1;      /* Soft borders */
+            --tab-bg: #e2e8f0;            /* Track background */
+            --tab-active: #ffffff;        /* Active tab background */
+            --tab-active-text: #0284c7;   /* Active tab text (Sky blue) */
             --input-bg: #ffffff;
             --shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.08), 0 8px 10px -6px rgba(2, 132, 199, 0.08);
             --badge-empty: #f1f5f9;
             --badge-neutral: #f8fafc;
         }
 
-        /* Общие стили — БЕЗ поддержки темной темы, только красивый светло-синий дизайн */
+        /* Dark Mode overrides */
+        .dark {
+            --bg-gradient-start: #0f172a; /* Dark slate */
+            --bg-gradient-end: #020617;   /* Almost black */
+            --card-bg: #1e293b;           /* Card background */
+            --text-main: #f8fafc;         /* Bright light text */
+            --text-muted: #94a3b8;        /* Muted gray */
+            --border-color: #334155;      /* Dark border */
+            --tab-bg: #0f172a;            /* Tab track */
+            --tab-active: #334155;        /* Active tab */
+            --tab-active-text: #38bdf8;   /* Bright blue active text */
+            --input-bg: #0f172a;          /* Dark input */
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            --badge-empty: #334155;
+            --badge-neutral: #1e293b;
+        }
+
+        /* Smooth state transitions */
+        body, .form-card, .form-row, .tabs-wrapper, .tab-button, .search-field, .barge-header-banner, .flag-box, .badge-rate, .theme-toggle-btn, .date-badge, .submit-btn {
+            transition: background 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Base styles */
         body {
             background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             color: var(--text-main);
@@ -41,7 +63,7 @@
             margin: 0 auto;
         }
 
-        /* Шапка дашборда */
+        /* Dashboard Header */
         .header-section {
             display: flex;
             align-items: center;
@@ -72,7 +94,11 @@
             font-weight: 900;
             margin: 0;
             letter-spacing: -0.02em;
-            color: #0369a1; /* Красивый синий заголовок */
+            color: #0284c7;
+        }
+        
+        .dark .main-title {
+            color: #38bdf8;
         }
 
         .sub-title {
@@ -89,12 +115,33 @@
             font-weight: 800;
             padding: 6px 12px;
             border-radius: 20px;
-            background-color: #e0f2fe;
-            color: #0369a1;
-            border: 1px solid #bae6fd;
+            background-color: var(--badge-neutral);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
         }
 
-        /* Премиум вкладки */
+        /* Theme toggle button */
+        .theme-toggle-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            outline: none;
+        }
+
+        .theme-toggle-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* Segmented control tabs */
         .tabs-wrapper {
             display: flex;
             background-color: var(--tab-bg);
@@ -118,7 +165,6 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: all 0.25s ease;
         }
 
         .tab-button.active {
@@ -127,7 +173,7 @@
             box-shadow: 0 4px 12px rgba(2, 132, 199, 0.1);
         }
 
-        /* Поле поиска */
+        /* Search Bar */
         .search-container {
             position: relative;
             margin-bottom: 20px;
@@ -144,7 +190,6 @@
             font-weight: 600;
             box-sizing: border-box;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .search-field:focus {
@@ -160,7 +205,7 @@
             color: var(--text-muted);
         }
 
-        /* Таблица / Карточка формы */
+        /* Responsive Freight Grid */
         .form-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -173,8 +218,8 @@
         .form-header {
             display: flex;
             padding: 14px 16px;
-            background-color: #f8fafc;
-            border-bottom: 1px solid #cbd5e1;
+            background-color: rgba(0, 0, 0, 0.015);
+            border-bottom: 1px solid var(--border-color);
             font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
@@ -200,8 +245,7 @@
             display: flex;
             align-items: center;
             padding: 14px 16px;
-            border-bottom: 1px solid #f1f5f9;
-            transition: background-color 0.15s;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .form-row:last-child {
@@ -221,16 +265,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #f1f5f9;
+            background-color: rgba(0, 0, 0, 0.03);
             border-radius: 10px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
         }
 
         .route-title {
             font-weight: 800;
             font-size: 15px;
             letter-spacing: -0.01em;
-            color: #0f172a;
+            color: var(--text-main);
         }
 
         .route-sub {
@@ -242,7 +286,7 @@
             margin-top: 2px;
         }
 
-        /* Стили биржевых бейджей (Крупные и контрастные) */
+        /* Price tag statuses (Highly contrasted) */
         .badge-rate {
             display: inline-flex;
             align-items: center;
@@ -258,42 +302,59 @@
 
         .rate-empty {
             background-color: var(--badge-empty);
-            color: #94a3b8;
+            color: var(--text-muted);
             font-weight: 600;
         }
 
         .rate-neutral {
             background-color: var(--badge-neutral);
             color: var(--text-main);
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
         }
 
-        /* 🟢 ПОДОРОЖАНИЕ (цена ↑) -> Плохо для трейдера -> Окрашиваем в КРАСНЫЙ цвет */
+        /* 🟢 UP trend (price ↑) -> Bad for trader -> RED badge */
         .rate-up-red {
-            background-color: #fee2e2 !important; /* Насыщенный светло-красный */
-            color: #b91c1c !important;         /* Глубокий темно-красный текст */
+            background-color: #fee2e2 !important; 
+            color: #b91c1c !important;         
             border: 1px solid #fca5a5 !important;
         }
 
-        /* 🔴 СНИЖЕНИЕ (цена ↓) -> Отлично для трейдера -> Окрашиваем в ЗЕЛЕНЫЙ цвет */
+        .dark .rate-up-red {
+            background-color: rgba(239, 68, 68, 0.18) !important;
+            color: #fca5a5 !important;
+            border: 1px solid rgba(239, 68, 68, 0.3) !important;
+        }
+
+        /* 🔴 DOWN trend (price ↓) -> Great for trader -> GREEN badge */
         .rate-down-green {
-            background-color: #dcfce7 !important; /* Насыщенный светло-зеленый */
-            color: #15803d !important;         /* Глубокий темно-зеленый текст */
+            background-color: #dcfce7 !important; 
+            color: #15803d !important;         
             border: 1px solid #86efac !important;
         }
 
-        /* Красивый разделитель для барж в голубом стиле */
+        .dark .rate-down-green {
+            background-color: rgba(16, 185, 129, 0.18) !important;
+            color: #86efac !important;
+            border: 1px solid rgba(16, 185, 129, 0.3) !important;
+        }
+
+        /* River Barges banner */
         .barge-header-banner {
-            background: linear-gradient(90deg, #e0f2fe 0%, #f0f9ff 100%);
-            border-top: 1px solid #bae6fd;
-            border-bottom: 1px solid #bae6fd;
+            background: linear-gradient(90deg, rgba(2, 132, 199, 0.08) 0%, rgba(2, 132, 199, 0.02) 100%);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
             padding: 12px 16px;
             font-size: 12px;
             font-weight: 800;
-            color: #0369a1;
+            color: #0284c7;
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+
+        .dark .barge-header-banner {
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.08) 0%, rgba(56, 189, 248, 0.02) 100%);
+            color: #38bdf8;
         }
 
         .barge-banner-tag {
@@ -306,7 +367,12 @@
             text-transform: uppercase;
         }
 
-        /* Кнопка скопировать ставки */
+        .dark .barge-banner-tag {
+            background-color: #38bdf8;
+            color: #0f172a;
+        }
+
+        /* Action button */
         .submit-btn {
             width: 100%;
             padding: 16px;
@@ -322,14 +388,13 @@
             justify-content: center;
             gap: 10px;
             box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
-            transition: transform 0.1s, opacity 0.2s;
         }
 
         .submit-btn:active {
             transform: scale(0.98);
         }
 
-        /* Тост-уведомление */
+        /* Toast Popup */
         .toast-box {
             position: fixed;
             bottom: 24px;
@@ -350,13 +415,18 @@
             gap: 8px;
             z-index: 9999;
         }
+
+        .dark .toast-box {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
 
-        <!-- Шапка -->
+        <!-- Header -->
         <div class="header-section">
             <div class="header-title-box">
                 <div class="header-logo">🚢</div>
@@ -365,61 +435,64 @@
                     <div class="sub-title">Giurgiulești Hub</div>
                 </div>
             </div>
-            <div id="date-label" class="date-badge">Загрузка...</div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">☀️</button>
+                <div id="date-label" class="date-badge">Loading...</div>
+            </div>
         </div>
 
-        <!-- Переключатель грузов -->
+        <!-- Cargo switch tabs -->
         <div class="tabs-wrapper">
             <button id="btn-heavy" onclick="switchTab('heavy')" class="tab-button active">
-                <span>🚢</span> Тяжелый груз
+                <span>🚢</span> Heavy Cargo
             </button>
             <button id="btn-light" onclick="switchTab('light')" class="tab-button">
-                <span>🌾</span> Легкий груз
+                <span>🌾</span> Light Cargo
             </button>
         </div>
 
-        <!-- Поиск -->
+        <!-- Search input -->
         <div class="search-container">
             <span class="search-icon-svg">🔍</span>
-            <input type="text" id="search-input" oninput="filterRoutes()" placeholder="Быстрый поиск направления..." class="search-field">
+            <input type="text" id="search-input" oninput="filterRoutes()" placeholder="Search destination..." class="search-field">
         </div>
 
-        <!-- Сетка и Форма -->
+        <!-- Freight Card -->
         <div class="form-card">
             
-            <!-- Заголовки колонок -->
+            <!-- Table headers -->
             <div class="form-header">
-                <div class="col-dest">Направление</div>
-                <div class="col-3000">3,000 тонн</div>
-                <div class="col-5000">5-6,000 тонн</div>
+                <div class="col-dest">Destination</div>
+                <div class="col-3000">3,000 Tons</div>
+                <div class="col-5000">5-6,000 Tons</div>
             </div>
 
-            <!-- Контейнер для МОРСКИХ СУДОВ -->
+            <!-- Sea routes container -->
             <div id="sea-routes-container"></div>
 
-            <!-- Разделитель БАРЖИ -->
+            <!-- River terminal separator -->
             <div class="barge-header-banner">
                 <div style="display: flex; align-items: center; gap: 6px;">
                     <span>🌊</span> 
-                    <span>Barges River Terminal (Баржи)</span>
+                    <span>Barges (River Terminal)</span>
                 </div>
                 <span class="barge-banner-tag">Active</span>
             </div>
 
-            <!-- Контейнер для БАРЖ -->
+            <!-- River barges container -->
             <div id="barge-routes-container"></div>
         </div>
 
-        <!-- Кнопка -->
+        <!-- Action Button -->
         <button onclick="copyToClipboardText()" class="submit-btn">
-            <span>📋</span> Скопировать ставки как текст
+            <span>📋</span> Copy Rates as Text
         </button>
 
     </div>
 
-    <!-- Тост -->
+    <!-- Toast Notification -->
     <div id="toast" class="toast-box">
-        <span>✅</span> Ставки успешно скопированы в буфер!
+        <span>✅</span> Rates copied to clipboard!
     </div>
 
     <script>
@@ -430,17 +503,41 @@
             "Egypt": "🇪🇬 Egypt", "CTZ": "🇷🇴 CTZ", "Ruse": "🇧🇬 Ruse"
         };
 
-        // Демо-данные по умолчанию
+        // Static fallback mock data
         const mockHeavy = "MRM:42u:40d,ECG:48d:22u,WCG:56u:26d,ECI:66d:31u,WCI:70u:34d,UK:145d:70u,Benghasi:58u:30d,Creta:55d:25u,Tunisia:60u:28d,Mersin:65u:-,Egypt:68d:-,CTZ:15d:15u,Ruse:15u:15d";
         const mockLight = "MRM:38d:36u,ECG:44u:20d,WCG:52d:24u,ECI:62u:29d,WCI:66d:32u,UK:135u:65d,Benghasi:52d:26u,Creta:50u:22d,Tunisia:55d:24u,Mersin:60u:-,Egypt:62d:-,CTZ:15d:15u,Ruse:15u:15d";
 
         let currentTab = 'heavy';
         let ratesData = { heavy: [], light: [] };
 
+        // Initialize UI Theme
+        function initTheme() {
+            let savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark');
+                document.getElementById('theme-toggle').innerHTML = '🌙';
+            } else {
+                document.body.classList.remove('dark');
+                document.getElementById('theme-toggle').innerHTML = '☀️';
+            }
+        }
+
+        // Toggle Dark/Light Mode
+        function toggleTheme() {
+            const isDark = document.body.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-toggle').innerHTML = isDark ? '🌙' : '☀️';
+            
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            }
+        }
+
+        // Parse query params or fallback
         function parseUrlData() {
             const params = new URLSearchParams(window.location.search);
-            const dateStr = params.get('d') || "09 июля в 18:00";
-            document.getElementById('date-label').innerText = `Обновлено: ${dateStr.replace('_', ' в ')}`;
+            const dateStr = params.get('d') || "09.07_18:00";
+            document.getElementById('date-label').innerText = `Updated: ${dateStr.replace('_', ' at ')}`;
 
             const heavyRaw = params.get('h') || mockHeavy;
             const lightRaw = params.get('l') || mockLight;
@@ -449,6 +546,7 @@
             ratesData.light = decodeRates(lightRaw);
         }
 
+        // Decode incoming raw ratings
         function decodeRates(raw) {
             if (!raw) return [];
             return raw.split(',').map(item => {
@@ -468,11 +566,11 @@
                         val = str.slice(0, -1);
                         if (lastChar === 'u') {
                             trend = '↑';
-                            style = 'rate-up-red';     /* РОСТ -> КРАСНЫЙ */
+                            style = 'rate-up-red';     /* PRICE UP -> RED */
                         }
                         if (lastChar === 'd') {
                             trend = '↓';
-                            style = 'rate-down-green'; /* ПАДЕНИЕ -> ЗЕЛЕНЫЙ */
+                            style = 'rate-down-green'; /* PRICE DOWN -> GREEN */
                         }
                     }
                     return { price: `$${val}`, trend, style };
@@ -554,9 +652,10 @@
             renderTable();
         }
 
+        // Export data to raw text in English format
         function copyToClipboardText() {
             let text = `⚡ Freight Rates — Giurgiulești\n`;
-            text += `${currentTab === 'heavy' ? '🚢 ТЯЖЕЛЫЙ ГРУЗ (Heavy)' : '🌾 ЛЕГКИЙ ГРУЗ (Light)'}\n\n`;
+            text += `${currentTab === 'heavy' ? '🚢 HEAVY CARGO' : '🌾 LIGHT CARGO'}\n\n`;
             text += `  Route       3,000t     5-6,000t\n`;
             text += `----------------------------------\n`;
 
@@ -572,7 +671,7 @@
             });
 
             text += `----------------------------------\n`;
-            text += `  Barges (Речные баржи)\n`;
+            text += `  Barges (River Terminal)\n`;
             text += `----------------------------------\n`;
 
             activeList.forEach(item => {
@@ -594,7 +693,7 @@
                 document.execCommand('copy');
                 showToast();
             } catch (err) {
-                console.error('Ошибка копирования:', err);
+                console.error('Failed to copy rates:', err);
             }
             document.body.removeChild(textarea);
         }
@@ -608,9 +707,11 @@
         }
 
         window.onload = function() {
+            initTheme();
             parseUrlData();
             renderTable();
         };
     </script>
 </body>
+</html>
 </html>
