@@ -6,42 +6,24 @@
     <title>Freight Rates — Giurgiulești Hub</title>
     
     <style>
-        /* Премиальная цветовая палитра с автоматической поддержкой темной и светлой темы телефона */
+        /* Премиальная светлая палитра: Белый фон, светло-синие и голубые акценты */
         :root {
-            --bg-gradient-start: #f8fafc;
-            --bg-gradient-end: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --tab-bg: #e2e8f0;
-            --tab-active: #ffffff;
-            --tab-active-text: #0f172a;
+            --bg-gradient-start: #f0f9ff; /* Нежно-голубой */
+            --bg-gradient-end: #e0f2fe;   /* Светло-синий */
+            --card-bg: #ffffff;           /* Белый */
+            --text-main: #0f172a;         /* Глубокий темно-синий */
+            --text-muted: #475569;        /* Серый slate */
+            --border-color: #cbd5e1;      /* Мягкая граница */
+            --tab-bg: #e2e8f0;            /* Фон переключателя */
+            --tab-active: #ffffff;        /* Активный переключатель */
+            --tab-active-text: #0284c7;   /* Цвет активного таба (Голубой) */
             --input-bg: #ffffff;
-            --shadow: 0 4px 12px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            --badge-empty: rgba(0, 0, 0, 0.03);
-            --badge-neutral: rgba(94, 109, 131, 0.1);
+            --shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.08), 0 8px 10px -6px rgba(2, 132, 199, 0.08);
+            --badge-empty: #f1f5f9;
+            --badge-neutral: #f8fafc;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-gradient-start: #0f172a;
-                --bg-gradient-end: #020617;
-                --card-bg: #1e293b;
-                --text-main: #f8fafc;
-                --text-muted: #94a3b8;
-                --border-color: #334155;
-                --tab-bg: #0f172a;
-                --tab-active: #334155;
-                --tab-active-text: #f8fafc;
-                --input-bg: #0f172a;
-                --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-                --badge-empty: rgba(255, 255, 255, 0.05);
-                --badge-neutral: rgba(148, 163, 184, 0.15);
-            }
-        }
-
-        /* Общие стили */
+        /* Общие стили — БЕЗ поддержки темной темы, только красивый светло-синий дизайн */
         body {
             background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             color: var(--text-main);
@@ -76,12 +58,12 @@
             width: 50px;
             height: 50px;
             border-radius: 14px;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             font-size: 26px;
-            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
             margin-right: 12px;
         }
 
@@ -90,6 +72,7 @@
             font-weight: 900;
             margin: 0;
             letter-spacing: -0.02em;
+            color: #0369a1; /* Красивый синий заголовок */
         }
 
         .sub-title {
@@ -106,9 +89,9 @@
             font-weight: 800;
             padding: 6px 12px;
             border-radius: 20px;
-            background-color: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-            border: 1px solid rgba(59, 130, 246, 0.15);
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
         }
 
         /* Премиум вкладки */
@@ -126,7 +109,7 @@
             padding: 12px;
             border: none;
             background: none;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 14px;
             border-radius: 10px;
             cursor: pointer;
@@ -141,7 +124,7 @@
         .tab-button.active {
             background-color: var(--tab-active);
             color: var(--tab-active-text);
-            box-shadow: var(--shadow);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.1);
         }
 
         /* Поле поиска */
@@ -165,8 +148,8 @@
         }
 
         .search-field:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
         }
 
         .search-icon-svg {
@@ -190,8 +173,8 @@
         .form-header {
             display: flex;
             padding: 14px 16px;
-            background-color: rgba(0, 0, 0, 0.02);
-            border-bottom: 1px solid var(--border-color);
+            background-color: #f8fafc;
+            border-bottom: 1px solid #cbd5e1;
             font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
@@ -217,7 +200,7 @@
             display: flex;
             align-items: center;
             padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #f1f5f9;
             transition: background-color 0.15s;
         }
 
@@ -238,14 +221,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: rgba(0, 0, 0, 0.03);
+            background-color: #f1f5f9;
             border-radius: 10px;
+            border: 1px solid #e2e8f0;
         }
 
         .route-title {
-            font-weight: 700;
+            font-weight: 800;
             font-size: 15px;
             letter-spacing: -0.01em;
+            color: #0f172a;
         }
 
         .route-sub {
@@ -257,7 +242,7 @@
             margin-top: 2px;
         }
 
-        /* Стили биржевых бейджей (Крупные и заметные) */
+        /* Стили биржевых бейджей (Крупные и контрастные) */
         .badge-rate {
             display: inline-flex;
             align-items: center;
@@ -273,48 +258,39 @@
 
         .rate-empty {
             background-color: var(--badge-empty);
-            color: var(--text-muted);
+            color: #94a3b8;
             font-weight: 600;
         }
 
         .rate-neutral {
             background-color: var(--badge-neutral);
             color: var(--text-main);
+            border: 1px solid #e2e8f0;
         }
 
-        /* Инвертированная логика цветов для трейдера: снижение ставки фрахта — это хорошо (зеленый) */
-        .rate-up {
-            background-color: rgba(239, 68, 68, 0.12); /* Красный цвет для роста цены фрахта */
-            color: #dc2626;
-            border: 1px solid rgba(239, 68, 68, 0.2);
+        /* 🟢 ПОДОРОЖАНИЕ (цена ↑) -> Плохо для трейдера -> Окрашиваем в КРАСНЫЙ цвет */
+        .rate-up-red {
+            background-color: #fee2e2 !important; /* Насыщенный светло-красный */
+            color: #b91c1c !important;         /* Глубокий темно-красный текст */
+            border: 1px solid #fca5a5 !important;
         }
 
-        .rate-down {
-            background-color: rgba(16, 185, 129, 0.12); /* Зеленый цвет для падения цены фрахта */
-            color: #059669;
-            border: 1px solid rgba(16, 185, 129, 0.2);
+        /* 🔴 СНИЖЕНИЕ (цена ↓) -> Отлично для трейдера -> Окрашиваем в ЗЕЛЕНЫЙ цвет */
+        .rate-down-green {
+            background-color: #dcfce7 !important; /* Насыщенный светло-зеленый */
+            color: #15803d !important;         /* Глубокий темно-зеленый текст */
+            border: 1px solid #86efac !important;
         }
 
-        @media (prefers-color-scheme: dark) {
-            .rate-up {
-                background-color: rgba(239, 68, 68, 0.18);
-                color: #f87171;
-            }
-            .rate-down {
-                background-color: rgba(16, 185, 129, 0.18);
-                color: #34d399;
-            }
-        }
-
-        /* Красивый разделитель для барж */
+        /* Красивый разделитель для барж в голубом стиле */
         .barge-header-banner {
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(90deg, #e0f2fe 0%, #f0f9ff 100%);
+            border-top: 1px solid #bae6fd;
+            border-bottom: 1px solid #bae6fd;
             padding: 12px 16px;
             font-size: 12px;
             font-weight: 800;
-            color: #3b82f6;
+            color: #0369a1;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -323,19 +299,19 @@
         .barge-banner-tag {
             font-size: 9px;
             font-weight: 900;
-            background-color: rgba(59, 130, 246, 0.2);
-            color: #3b82f6;
+            background-color: #0284c7;
+            color: #ffffff;
             padding: 2px 6px;
             border-radius: 4px;
             text-transform: uppercase;
         }
 
-        /* Кнопка */
+        /* Кнопка скопировать ставки */
         .submit-btn {
             width: 100%;
             padding: 16px;
             border-radius: 14px;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
             color: #ffffff;
             font-weight: 700;
             font-size: 15px;
@@ -345,7 +321,7 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
             transition: transform 0.1s, opacity 0.2s;
         }
 
@@ -365,7 +341,7 @@
             font-weight: 700;
             padding: 12px 24px;
             border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -373,13 +349,6 @@
             align-items: center;
             gap: 8px;
             z-index: 9999;
-        }
-        
-        @media (prefers-color-scheme: dark) {
-            .toast-box {
-                background-color: #f8fafc;
-                color: #0f172a;
-            }
         }
     </style>
 </head>
@@ -499,11 +468,11 @@
                         val = str.slice(0, -1);
                         if (lastChar === 'u') {
                             trend = '↑';
-                            style = 'rate-up'; // Было 'rate-up' (зеленый), стало 'rate-up' (красный) — так как цена выросла
+                            style = 'rate-up-red';     /* РОСТ -> КРАСНЫЙ */
                         }
                         if (lastChar === 'd') {
                             trend = '↓';
-                            style = 'rate-down'; // Было 'rate-down' (красный), стало 'rate-down' (зеленый) — так как цена снизилась
+                            style = 'rate-down-green'; /* ПАДЕНИЕ -> ЗЕЛЕНЫЙ */
                         }
                     }
                     return { price: `$${val}`, trend, style };
@@ -644,5 +613,4 @@
         };
     </script>
 </body>
-</html>
 </html>
