@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Freight Rates — Giurgiulești</title>
+    <!-- Подключаем Tailwind CSS для современного и чистого дизайна -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключаем Telegram WebApp JS SDK для интеграции с Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <style>
+        /* CSS переменные для автоматической адаптации под тему Telegram */
+        :root {
+            --tg-bg: #f4f6f9;
+            --tg-card-bg: #ffffff;
+            --tg-text: #1f2937;
+            --tg-text-muted: #6b7280;
+            --tg-accent: #3b82f6;
+            --tg-accent-hover: #2563eb;
+            --tg-border: #e5e7eb;
+        }
+
+        body {
+            background-color: var(--tg-bg);
+            color: var(--tg-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .custom-card {
+            background-color: var(--tg-card-bg);
+            border: 1px solid var(--tg-border);
+        }
+
+        .tab-transition {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="p-4 min-h-screen">
+
+    <!-- Шапка формы -->
+    <div class="mb-6 text-center">
+        <h1 class="text-2xl font-black tracking-tight mb-1">🚢 Freight Rates</h1>
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-500" id="date-label">Загрузка данных...</p>
+    </div>
+
+    <!-- Переключатель типа груза (Сегментированная кнопка) -->
+    <div class="flex p-1 rounded-xl bg-gray-200/80 dark:bg-gray-800/40 mb-6 custom-card">
+        <button id="btn-heavy" onclick="switchTab('heavy')" class="tab-transition flex-1 py-3 text-center rounded-lg font-bold text-sm flex items-center justify-center gap-2 bg-white text-gray-800 shadow-sm">
+            <span>🚢</span> Тяжелый груз
+        </button>
+        <button id="btn-light" onclick="switchTab('light')" class="tab-transition flex-1 py-3 text-center rounded-lg font-bold text-sm flex items-center justify-center gap-2 text-gray-500 hover:text-gray-800">
+            <span>🌾</span> Легкий груз
+        </button>
+    </div>
+
+    <!-- Поиск по направлениям -->
+    <div class="mb-5 relative">
+        <input type="text" id="search-input" oninput="filterRoutes()" placeholder="Быстрый поиск направления..." 
+               class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-semibold custom-card">
+        <span class="absolute left-3 top-3.5 text-gray-400">🔍</span>
+    </div>
+
+    <!-- Таблица ставок -->
+    <div class="rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-6 custom-card">
+        
+        <!-- Заголовок таблицы -->
+        <div class="grid grid-cols-12 bg-gray-50/70 border-b border-gray-100 p-4 text-xs font-black uppercase tracking-wider text-gray-400">
+            <div class="col-span-6">Направление</div>
+            <div class="col-span-3 text-center">3,000t</div>
+            <div class="col-span-3 text-center">5-6,000t</div>
+        </div>
+
+        <!-- Контейнер для строк морских судов -->
+        <div id="sea-routes-container" class="divide-y divide-gray-100">
+            <!-- Строки генерируются динамически -->
+        </div>
+
+        <!-- Разделитель для барж -->
+        <div class="bg-blue-50/40 border-y border-blue-100/50 p-3 px-4 text-xs font-extrabold text-blue-600 flex items-center gap-2">
+            <span>🌊</span> Речные баржи (Barges)
+        </div>
+
+        <!-- Контейнер для строк барж -->
+        <div id="barge-routes-container" class="divide-y divide-gray-100">
+            <!-- Строки барж генерируются динамически -->
+        </div>
+    </div>
+
+    <!-- Кнопка "Скопировать как текст" -->
+    <button onclick="copyToClipboardText()" class="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition duration-200 active:scale-[0.98]">
+        <span>📋</span> Скопировать ставки как текст
+    </button>
+
+    <!-- Всплывающее уведомление -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 bg-black/80 text-white text-xs font-bold rounded-xl shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 flex items-center gap-2">
+        <span>✅</span> Ставки успешно скопированы!
+    </div>
+
+    <script>
+        // Соответствие кодов стран флагам и полным названиям
+        const FLAGS = {
+            "MRM": "🇹🇷 MRM", "ECG": "🇬🇷 ECG", "WCG": "🇬🇷 WCG", "ECI": "🇮🇹 ECI", 
+            "WCI": "🇮🇹 WCI", "UK": "🇬🇧 UK", "Benghasi": "🇱🇾 Benghasi", 
+            "Creta": "🇬🇷 Creta", "Tunisia": "🇹🇳 Tunisia", "Mersin": "🇹🇷 Mersin", 
+            "Egypt": "🇪🇬 Egypt", "CTZ": "🇷🇴 CTZ", "Ruse": "🇧🇬 Ruse"
+        };
+
+        // Демо-данные с включенными ставками на БАРЖИ (CTZ и Ruse) для полноценной работы формы
+        const mockHeavy = "MRM:42u:40d,ECG:48d:22u,WCG:56u:26d,ECI:66d:31u,WCI:70u:34d,UK:145d:70u,Benghasi:58u:30d,Creta:55d:25u,Tunisia:60u:28d,Mersin:65u:-,Egypt:68d:-,CTZ:18u:18d,Ruse:18u:18d";
+        const mockLight = "MRM:38d:36u,ECG:44u:20d,WCG:52d:24u,ECI:62u:29d,WCI:66d:32u,UK:135u:65d,Benghasi:52d:26u,Creta:50u:22d,Tunisia:55d:24u,Mersin:60u:-,Egypt:62d:-,CTZ:15d:15u,Ruse:15d:15u";
+
+        let currentTab = 'heavy';
+        let ratesData = { heavy: [], light: [] };
+        let activeRates = [];
+
+        // Инициализация Telegram WebApp и цветовых схем
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            
+            const root = document.documentElement;
+            if (tg.themeParams.bg_color) root.style.setProperty('--tg-bg', tg.themeParams.bg_color);
+            if (tg.themeParams.secondary_bg_color) root.style.setProperty('--tg-card-bg', tg.themeParams.secondary_bg_color);
+            if (tg.themeParams.text_color) root.style.setProperty('--tg-text', tg.themeParams.text_color);
+            if (tg.themeParams.hint_color) root.style.setProperty('--tg-text-muted', tg.themeParams.hint_color);
+            if (tg.themeParams.button_color) root.style.setProperty('--tg-accent', tg.themeParams.button_color);
+            if (tg.themeParams.section_separator_color) root.style.setProperty('--tg-border', tg.themeParams.section_separator_color);
+        }
+
+        // Получение и расшифровка параметров из URL
+        function parseUrlData() {
+            const params = new URLSearchParams(window.location.search);
+            const dateStr = params.get('d') || "09 июля в 18:00";
+            document.getElementById('date-label').innerText = `Обновлено: ${dateStr.replace('_', ' в ')}`;
+
+            const heavyRaw = params.get('h') || mockHeavy;
+            const lightRaw = params.get('l') || mockLight;
+
+            ratesData.heavy = decodeRates(heavyRaw);
+            ratesData.light = decodeRates(lightRaw);
+        }
+
+        // Декодирование сжатой строки котировок в массив объектов
+        function decodeRates(raw) {
+            if (!raw) return [];
+            return raw.split(',').map(item => {
+                const parts = item.split(':');
+                const code = parts[0];
+                const r3k = parts[1] || '-';
+                const r6k = parts[2] || '-';
+
+                const formatCell = (str) => {
+                    if (str === '-' || !str) return { price: '-', trend: '' };
+                    const val = str.slice(0, -1);
+                    const trendCode = str.slice(-1);
+                    let trend = '';
+                    if (trendCode === 'u') trend = '🔺';
+                    if (trendCode === 'd') trend = '🔻';
+                    return { price: `$${val}`, trend };
+                };
+
+                return {
+                    code: code,
+                    flag: FLAGS[code] ? FLAGS[code].split(' ')[0] : '🌐',
+                    name: FLAGS[code] ? FLAGS[code].split(' ')[1] : code,
+                    r3k: formatCell(r3k),
+                    r6k: formatCell(r6k)
+                };
+            });
+        }
+
+        // Отрисовка интерактивной таблицы
+        function renderTable() {
+            const seaContainer = document.getElementById('sea-routes-container');
+            const bargeContainer = document.getElementById('barge-routes-container');
+            
+            seaContainer.innerHTML = '';
+            bargeContainer.innerHTML = '';
+
+            const filterText = document.getElementById('search-input').value.toLowerCase();
+            activeRates = ratesData[currentTab];
+
+            activeRates.forEach(item => {
+                // Фильтрация поиска по имени направления
+                if (filterText && !item.name.toLowerCase().includes(filterText)) return;
+
+                const isBarge = (item.code === 'CTZ' || item.code === 'Ruse');
+                const targetContainer = isBarge ? bargeContainer : seaContainer;
+
+                const row = document.createElement('div');
+                row.className = "grid grid-cols-12 p-4 items-center transition active:bg-gray-50/50 hover:bg-gray-50/20";
+                
+                row.innerHTML = `
+                    <div class="col-span-6 flex items-center gap-3">
+                        <span class="text-xl">${item.flag}</span>
+                        <span class="font-bold text-sm tracking-wide">${item.name}</span>
+                    </div>
+                    <div class="col-span-3 text-center">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-black text-sm ${item.r3k.price !== '-' ? 'bg-gray-100 text-gray-800' : 'text-gray-300'}">
+                            ${item.r3k.price} <span class="text-xs">${item.r3k.trend}</span>
+                        </span>
+                    </div>
+                    <div class="col-span-3 text-center">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-black text-sm ${item.r6k.price !== '-' ? 'bg-gray-100 text-gray-800' : 'text-gray-300'}">
+                            ${item.r6k.price} <span class="text-xs">${item.r6k.trend}</span>
+                        </span>
+                    </div>
+                `;
+                targetContainer.appendChild(row);
+            });
+        }
+
+        // Переключение вкладок Тяжелый/Легкий груз
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            const btnHeavy = document.getElementById('btn-heavy');
+            const btnLight = document.getElementById('btn-light');
+
+            if (tab === 'heavy') {
+                btnHeavy.className = "tab-transition flex-1 py-3 text-center rounded-lg font-bold text-sm flex items-center justify-center gap-2 bg-white text-gray-800 shadow-sm";
+                btnLight.className = "tab-transition flex-1 py-3 text-center rounded-lg font-bold text-sm flex items-center justify-center gap-2 text-gray-500 hover:text-gray-800";
+            } else {
+                btnLight.className = "tab-transition flex-1 py-3 text-center rounded-lg font-bold text-sm flex items-center justify-center gap-2 bg-white text-gray-800 shadow-sm";
+                btnHeavy.className = "tab-transition flex-1 py-3 text-center rounded-lg font-bold text-sm flex items-center justify-center gap-2 text-gray-500 hover:text-gray-800";
+            }
+
+            // Виброотклик на смартфонах
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            }
+
+            renderTable();
+        }
+
+        function filterRoutes() {
+            renderTable();
+        }
+
+        // Копирование котировок в буфер в текстовом формате
+        function copyToClipboardText() {
+            let text = `⚡ Freight Rates — Giurgiulești\n`;
+            text += `${currentTab === 'heavy' ? '🚢 ТЯЖЕЛЫЙ ГРУЗ (Heavy)' : '🌾 ЛЕГКИЙ ГРУЗ (Light)'}\n\n`;
+            text += `  Route       3,000t     5-6,000t\n`;
+            text += `----------------------------------\n`;
+
+            const activeList = ratesData[currentTab];
+            
+            activeList.forEach(item => {
+                if (item.code !== 'CTZ' && item.code !== 'Ruse') {
+                    const fullName = `${item.flag} ${item.name}`;
+                    const r3kText = `${item.r3k.price}${item.r3k.trend}`.trim();
+                    const r6kText = `${item.r6k.price}${item.r6k.trend}`.trim();
+                    text += `${fullName.padEnd(12)} ${r3kText.padEnd(10)} ${r6kText}\n`;
+                }
+            });
+
+            text += `----------------------------------\n`;
+            text += `  Barges (Речные баржи)\n`;
+            text += `----------------------------------\n`;
+
+            activeList.forEach(item => {
+                if (item.code === 'CTZ' || item.code === 'Ruse') {
+                    const fullName = `${item.flag} ${item.name}`;
+                    const r3kText = `${item.r3k.price}${item.r3k.trend}`.trim();
+                    const r6kText = `${item.r6k.price}${item.r6k.trend}`.trim();
+                    text += `${fullName.padEnd(12)} ${r3kText.padEnd(10)} ${r6kText}\n`;
+                }
+            });
+
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast();
+            } catch (err) {
+                console.error('Ошибка копирования:', err);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.className = toast.className.replace('opacity-0 pointer-events-none', 'opacity-100');
+            setTimeout(() => {
+                toast.className = toast.className.replace('opacity-100', 'opacity-0 pointer-events-none');
+            }, 2000);
+        }
+
+        window.onload = function() {
+            parseUrlData();
+            renderTable();
+        };
+    </script>
+</body>
+</html>
+```
+eof
+
+```python:Финальный скрипт бота с WebApp для трейдеров:main.py
+import asyncio
+import logging
+from datetime import datetime
+import urllib.parse
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+# Импортируем твой модуль базы данных SQLite
+import database
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+
+# Токен твоего бота (оставляем его здесь)
+BOT_TOKEN = "8618888018:AAH..."  # Замени на свой реальный токен, если он стерся
+
+# Инициализация бота и диспетчера
+bot = Bot(token=BOT_TOKEN)
+dp = Dispatcher()
+scheduler = AsyncIOScheduler()
+
+# ========================================================
+# НАСТРОЙКИ ССЫЛОК И БАЗЫ ДАННЫХ
+
+# Ссылка на твою опубликованную WebApp форму (traders.html)
+# ТЕБЕ НУЖНО: Загрузить traders.html на бесплатный хостинг (например, GitHub Pages, Vercel или Netlify) 
+# и вставить сюда полученную https-ссылку!
+TRADERS_WEBAPP_URL = "https://your-domain.com/traders.html"
+
+# 1. Брокеры МОРСКИХ судов (Лодок)
+SEA_BROKERS = [
+    "305555869",  # AquaVita
+    "227043557",  # AGA
+    "174996888"   # Игорь (Контроль моря)
+]
+
+# 2. Брокеры РЕЧНЫХ барж
+BARGE_BROKERS = [
+    "6906358593", # Брокер баржи
+    "8965559895"  # Игорь (Контроль барж)
+]
+
+# ЧАТ ТРЕЙДЕРОВ И КОНКРЕТНАЯ ТЕМА ДЛЯ ОТЧЕТА
+TRADERS_CHAT_ID = "-1002015815570"  # Группа трейдеров
+REPORT_TOPIC_ID = 8227               # Тема №8227 внутри группы
+
+# Словарь флагов и направлений (маршрутов)
+FLAGS = {
+    "MRM": "🇹🇷 MRM",
+    "ECG": "🇬🇷 ECG",
+    "WCG": "🇬🇷 WCG",
+    "ECI": "🇮🇹 ECI",
+    "WCI": "🇮🇹 WCI",
+    "UK": "🇬🇧 UK",
+    "Benghasi": "🇱🇾 Benghasi",
+    "Creta": "🇬🇷 Creta",
+    "Tunisia": "🇹🇳 Tunisia",
+    "Mersin": "🇹🇷 Mersin",
+    "Egypt": "🇪🇬 Egypt",
+    "CTZ": "🇷🇴 CTZ",
+    "Ruse": "🇧🇬 Ruse"
+}
+# ========================================================
+
+
+def build_table_block(cargo_key, title_name, report_data):
+    """
+    Резервная функция: строит блок таблицы текстом (для превью).
+    """
+    block_text = f"📊 *{title_name}*\n\n"
+    block_text += "*Route             3,000t          5-6,000t*\n"
+    block_text += "------------------------------------------\n"
+    
+    for code, full_name in FLAGS.items():
+        if code in ["CTZ", "Ruse"]:
+            continue
+            
+        emoji = full_name[:2]
+        name_only = full_name[2:].strip()
+        
+        r = report_data[cargo_key].get(code, {2000: None, 3000: None, 5000: None, 6000: None})
+        v3k_val = r.get(3000)
+        v3k = v3k_val if v3k_val else "-"
+            
+        if r.get(6000):
+            v6k = r[6000]
+        elif r.get(5000):
+            v6k = r[5000]
+        else:
+            v6k = "-"
+        
+        name_padded = name_only.ljust(12)
+        v3k_padded = str(v3k).ljust(9)
+        v6k_padded = str(v6k).ljust(9)
+        
+        row_text = f"│ {name_padded} │ {v3k_padded} │ {v6k_padded} │"
+        block_text += f"{emoji} `{row_text}`\n"
+        
+    block_text += "------------------------------------------\n"
+    return block_text
+
+
+async def send_telegraph_report(message=None, to_group=True):
+    """
+    Генерирует отчет фрахта, сжимает данные в хэш и отправляет в группу трейдеров
+    вместе с кнопкой открытия интерактивного WebApp отчета.
+    """
+    current_rates = database.get_current_rates_summary()
+    history_rates = database.get_previous_rates_average()
+    
+    # Определяем получателя отчета
+    if to_group:
+        target_id = TRADERS_CHAT_ID
+        thread_id = REPORT_TOPIC_ID
+    else:
+        target_id = message.chat.id if message else TRADERS_CHAT_ID
+        thread_id = None
+    
+    if not current_rates and not message:
+        await bot.send_message(
+            chat_id=TRADERS_CHAT_ID, 
+            text="⚠️ Время 14:00. Ни один брокер не внес котировки фрахта за сегодня. Отчет пуст.",
+            message_thread_id=REPORT_TOPIC_ID
+        )
+        return
+
+    # 1. СТРУКТУРИРУЕМ ДАННЫЕ ДЛЯ ТЕКСТА И ДЛЯ ВЕБ-ФОРМЫ (WEBAPP)
+    report_data = {'heavy': {}, 'light': {}}
+    serialized = {'heavy': {}, 'light': {}}
+    
+    for cargo_type, dest, size, avg_r in current_rates:
+        if dest not in report_data[cargo_type]:
+            report_data[cargo_type][dest] = {2000: None, 3000: None, 5000: None, 6000: None}
+        if dest not in serialized[cargo_type]:
+            serialized[cargo_type][dest] = {3000: "-", 6000: "-"}
+            
+        if avg_r is not None:
+            rounded_avg = round(avg_r)
+            rate_text = f"${rounded_avg}"
+            trend_letter = "n"  # n = none (без изменений)
+            
+            # Проверка динамики (стрелочки)
+            prev_avg = history_rates.get(cargo_type, {}).get(dest, {}).get(size)
+            if prev_avg:
+                prev_rounded = round(prev_avg)
+                if rounded_avg > prev_rounded:
+                    rate_text += "↑"
+                    trend_letter = "u"  # u = up (вырос)
+                elif rounded_avg < prev_rounded:
+                    rate_text += "↓"
+                    trend_letter = "d"  # d = down (упал)
+            
+            target_size = 3000 if size in [2000, 3000] else 6000
+            report_data[cargo_type][dest][target_size] = rate_text
+            serialized[cargo_type][dest][target_size] = f"{rounded_avg}{trend_letter}"
+
+    # 2. УПАКОВЫВАЕМ И СЖИМАЕМ ВСЕ СТАВКИ В URL ДЛЯ WEBAPP
+    now = datetime.now()
+    
+    def compress_rates(cargo):
+        parts = []
+        # Проходим строго по всем кодам флагов, чтобы сохранить исходный порядок
+        for code in FLAGS.keys():
+            sizes = serialized[cargo].get(code, {3000: "-", 6000: "-"})
+            r3 = sizes.get(3000, "-")
+            r6 = sizes.get(6000, "-")
+            parts.append(f"{code}:{r3}:{r6}")
+        return ",".join(parts)
+
+    heavy_query = compress_rates('heavy')
+    light_query = compress_rates('light')
+    date_query = now.strftime('%d.%m_%H:%M')
+
+    # Формируем итоговый WebApp URL с параметрами
+    params = {
+        "d": date_query,
+        "h": heavy_query,
+        "l": light_query
+    }
+    encoded_params = urllib.parse.urlencode(params)
+    webapp_url = f"{TRADERS_WEBAPP_URL}?{encoded_params}"
+
+    # 3. ФОРМИРУЕМ ИНЛАЙН КНОПКУ ДЛЯ ОТКРЫТИЯ ВЕБ-ФОРМЫ
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="📊 Открыть интерактивную форму", 
+                    web_app=WebAppInfo(url=webapp_url)
+                )
+            ]
+        ]
+    )
+
+    # Красивый вводный текст
+    months_ru = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
+    date_str = f"{now.day} {months_ru[now.month-1]} в {now.strftime('%H:%M')}"
+    
+    text = f"⚡ *Freight Rates — Giurgiulești*\n"
+    text += f"📅 *{date_str}*\n\n"
+    text += "📊 Рассчитаны свежие средние ставки фрахта брокеров.\n"
+    text += "Нажмите на кнопку ниже, чтобы открыть интерактивную форму, переключить груз (тяжелый/легкий) или воспользоваться поиском! 👇"
+
+    try:
+        await bot.send_message(
+            chat_id=target_id, 
+            text=text, 
+            parse_mode="Markdown",
+            message_thread_id=thread_id,
+            reply_markup=keyboard  # Прикрепляем нашу кнопку-WebApp к сообщению!
+        )
+        
+        if message and not to_group:
+            await message.reply(
+                "👁️ *Превью WebApp отчета успешно сформировано!*\n"
+                "Оно прикреплено к кнопке выше.\n\n"
+                "Если всё выглядит отлично, отправь:\n"
+                "➡️ /publish_report — чтобы опубликовать этот интерактивный отчет в группу трейдеров."
+            )
+        elif message and to_group:
+            await message.reply("✅ Интерактивный отчет успешно опубликован в группу трейдеров!")
+            
+    except Exception as e:
+        print(f"Ошибка при отправке отчета: {e}")
+        if message:
+            await message.reply(f"❌ Не удалось выполнить отправку. Ошибка: {e}")
+
+
+# Заглушки для планировщика
+async def start_monday_poll(message=None):
+    pass
+
+async def check_and_remind_brokers(message=None):
+    pass
+
+
+# Настройка автоматического планировщика по вторникам
+def setup_scheduler():
+    scheduler.add_job(start_monday_poll, 'cron', day_of_week='tue', hour=10, minute=0)
+    scheduler.add_job(check_and_remind_brokers, 'cron', day_of_week='tue', hour=10, minute=30)
+    scheduler.add_job(lambda: send_telegraph_report(to_group=True), 'cron', day_of_week='tue', hour=14, minute=0)
+    scheduler.start()
+
+
+# Обработчики команд ручного тестирования
+async def test_poll_handler(message: types.Message):
+    await start_monday_poll(message)
+
+async def test_remind_handler(message: types.Message):
+    await check_and_remind_brokers(message)
+
+async def test_report_preview_handler(message: types.Message):
+    # /test_report шлет отчет ТОЛЬКО тебе в личку для проверки (to_group=False)
+    await send_telegraph_report(message=message, to_group=False)
+
+async def publish_report_handler(message: types.Message):
+    # /publish_report шлет отчет принудительно в группу трейдеров (to_group=True)
+    await send_telegraph_report(message=message, to_group=True)
+
+
+async def main():
+    database.init_db()
+    setup_scheduler()
+    
+    # Регистрация команд
+    dp.message.register(test_poll_handler, Command("test_poll"))
+    dp.message.register(test_remind_handler, Command("test_remind"))
+    dp.message.register(test_report_preview_handler, Command("test_report"))
+    dp.message.register(publish_report_handler, Command("publish_report"))
+    
+    await dp.start_polling(bot)
+
+ 
+if __name__ == '__main__':
+    asyncio.run(main())
+```
+eof
+
+---
+
+### Твои дальнейшие действия:
+1. Скопируй код из правой панели (вкладка **`traders.html`**) и загрузи на [**app.netlify.com/drop**](https://app.netlify.com/drop) или другой хостинг. Получи готовую `https://` ссылку на этот файл.
+2. Открой вкладку **`main.py`**, скопируй этот код и замени им содержимое файла на своем компьютере.
+3. Вставь полученную из Netlify ссылку в строку №28:
+   ```python
+   TRADERS_WEBAPP_URL = "твоя_ссылка_на_traders.html"
+   ```
+4. Запусти бота командой `py main.py`. 
+5. Отправляй боту **/test_report** и наслаждайся результатом прямо с телефона! Как сделаешь — дай знать, получилось ли!
