@@ -3,28 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Freight Rates — Giurgiulești</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts Inter для идеальной типографики -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Telegram WebApp JS SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Freight Rates — Giurgiulești Hub</title>
+    
     <style>
+        /* Премиальная цветовая палитра с автоматической поддержкой темной и светлой темы телефона */
         :root {
             --bg-gradient-start: #f8fafc;
             --bg-gradient-end: #f1f5f9;
             --card-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --border-color: #f1f5f9;
-            --accent-color: #3b82f6;
-            --accent-hover: #1d4ed8;
-            --shadow-sm: 0 2px 8px -1px rgba(0, 0, 0, 0.05), 0 1px 3px -1px rgba(0, 0, 0, 0.03);
-            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+            --border-color: #e2e8f0;
+            --tab-bg: #e2e8f0;
+            --tab-active: #ffffff;
+            --tab-active-text: #0f172a;
+            --input-bg: #ffffff;
+            --shadow: 0 4px 12px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --badge-empty: rgba(0, 0, 0, 0.03);
+            --badge-neutral: rgba(94, 109, 131, 0.1);
         }
 
-        /* Автоматическая темная тема Telegram */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-gradient-start: #0f172a;
@@ -33,109 +31,425 @@
                 --text-main: #f8fafc;
                 --text-muted: #94a3b8;
                 --border-color: #334155;
-                --accent-color: #3b82f6;
-                --accent-hover: #60a5fa;
+                --tab-bg: #0f172a;
+                --tab-active: #334155;
+                --tab-active-text: #f8fafc;
+                --input-bg: #0f172a;
+                --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+                --badge-empty: rgba(255, 255, 255, 0.05);
+                --badge-neutral: rgba(148, 163, 184, 0.15);
             }
         }
 
+        /* Общие стили */
         body {
             background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             color: var(--text-main);
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 16px;
+            min-height: 100vh;
             -webkit-user-select: none;
             user-select: none;
+            box-sizing: border-box;
         }
 
-        .premium-card {
+        .container {
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        /* Шапка дашборда */
+        .header-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            justify-content: space-between;
+        }
+
+        .header-title-box {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+            margin-right: 12px;
+        }
+
+        .main-title {
+            font-size: 22px;
+            font-weight: 900;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        .sub-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 2px;
+        }
+
+        .date-badge {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.15);
+        }
+
+        /* Премиум вкладки */
+        .tabs-wrapper {
+            display: flex;
+            background-color: var(--tab-bg);
+            padding: 4px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+
+        .tab-button.active {
+            background-color: var(--tab-active);
+            color: var(--tab-active-text);
+            box-shadow: var(--shadow);
+        }
+
+        /* Поле поиска */
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-field {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 600;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .search-icon-svg {
+            position: absolute;
+            left: 16px;
+            top: 15px;
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+
+        /* Таблица / Карточка формы */
+        .form-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-sm);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
         }
 
-        .tab-transition {
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        .form-header {
+            display: flex;
+            padding: 14px 16px;
+            background-color: rgba(0, 0, 0, 0.02);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
         }
 
-        /* Эффект свечения для активных элементов */
-        .active-glow {
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.25);
+        .col-dest {
+            flex: 6;
+        }
+
+        .col-3000 {
+            flex: 3;
+            text-align: center;
+        }
+
+        .col-5000 {
+            flex: 3;
+            text-align: center;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.15s;
+        }
+
+        .form-row:last-child {
+            border-bottom: none;
+        }
+
+        .route-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .flag-box {
+            font-size: 22px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.03);
+            border-radius: 10px;
+        }
+
+        .route-title {
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: -0.01em;
+        }
+
+        .route-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* Стили биржевых бейджей (Крупные и заметные) */
+        .badge-rate {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 14px;
+            min-width: 76px;
+            box-sizing: border-box;
+        }
+
+        .rate-empty {
+            background-color: var(--badge-empty);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .rate-neutral {
+            background-color: var(--badge-neutral);
+            color: var(--text-main);
+        }
+
+        .rate-up {
+            background-color: rgba(16, 185, 129, 0.12);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .rate-down {
+            background-color: rgba(239, 68, 68, 0.12);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .rate-up {
+                background-color: rgba(16, 185, 129, 0.18);
+                color: #34d399;
+            }
+            .rate-down {
+                background-color: rgba(239, 68, 68, 0.18);
+                color: #f87171;
+            }
+        }
+
+        /* Красивый разделитель для барж */
+        .barge-header-banner {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .barge-banner-tag {
+            font-size: 9px;
+            font-weight: 900;
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        /* Кнопка */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Тост-уведомление */
+        .toast-box {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #0f172a;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 9999;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .toast-box {
+                background-color: #f8fafc;
+                color: #0f172a;
+            }
         }
     </style>
 </head>
-<body class="p-4 min-h-screen pb-12">
+<body>
 
-    <!-- Шапка дашборда -->
-    <div class="mb-6 relative flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-2xl shadow-lg active-glow">
-                🚢
-            </div>
-            <div>
-                <h1 class="text-xl font-extrabold tracking-tight leading-none mb-1">Freight Rates</h1>
-                <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Giurgiulești Hub</span>
+    <div class="container">
+
+        <!-- Шапка -->
+        <div class="header-section">
+            <div class="header-title-box">
+                <div class="header-logo">🚢</div>
+                <div>
+                    <h1 class="main-title">Freight Rates</h1>
+                    <div class="sub-title">Giurgiulești Hub</div>
                 </div>
             </div>
-        </div>
-        <div class="text-right">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20" id="date-label">
-                Обновлено: Загрузка...
-            </span>
-        </div>
-    </div>
-
-    <!-- Переключатель грузов (Премиум дизайн) -->
-    <div class="flex p-1.5 rounded-2xl bg-slate-200/50 dark:bg-slate-800/40 mb-5 premium-card">
-        <button id="btn-heavy" onclick="switchTab('heavy')" class="tab-transition flex-1 py-3 text-center rounded-xl font-bold text-sm flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/10">
-            <span>🚢</span> Тяжелый груз
-        </button>
-        <button id="btn-light" onclick="switchTab('light')" class="tab-transition flex-1 py-3 text-center rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100">
-            <span>🌾</span> Легкий груз
-        </button>
-    </div>
-
-    <!-- Поиск по направлениям -->
-    <div class="mb-6 relative">
-        <input type="text" id="search-input" oninput="filterRoutes()" placeholder="Поиск направления или порта..." 
-               class="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/60 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-semibold premium-card transition-all duration-250">
-        <span class="absolute left-4 top-4.5 text-slate-400">🔍</span>
-    </div>
-
-    <!-- Основной терминал ставок -->
-    <div class="rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800/80 mb-6 premium-card shadow-xl">
-        
-        <!-- Заголовок таблицы -->
-        <div class="grid grid-cols-12 bg-slate-50/80 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800/60 p-4 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
-            <div class="col-span-6">Направление</div>
-            <div class="col-span-3 text-center">3,000 тонн</div>
-            <div class="col-span-3 text-center">5-6,000 тонн</div>
+            <div id="date-label" class="date-badge">Загрузка...</div>
         </div>
 
-        <!-- Контейнер для МОРСКИХ СУДОВ -->
-        <div id="sea-routes-container" class="divide-y divide-slate-100 dark:divide-slate-800/40"></div>
+        <!-- Переключатель грузов -->
+        <div class="tabs-wrapper">
+            <button id="btn-heavy" onclick="switchTab('heavy')" class="tab-button active">
+                <span>🚢</span> Тяжелый груз
+            </button>
+            <button id="btn-light" onclick="switchTab('light')" class="tab-button">
+                <span>🌾</span> Легкий груз
+            </button>
+        </div>
 
-        <!-- Разделитель БАРЖИ (Премиум градиентный баннер) -->
-        <div class="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 border-y border-blue-500/10 dark:border-blue-500/20 p-4 text-xs font-black text-blue-500 flex items-center justify-between tracking-wide">
-            <div class="flex items-center gap-2">
-                <span class="text-lg">🌊</span> 
-                <span>Barges River Terminal (Речные баржи)</span>
+        <!-- Поиск -->
+        <div class="search-container">
+            <span class="search-icon-svg">🔍</span>
+            <input type="text" id="search-input" oninput="filterRoutes()" placeholder="Быстрый поиск направления..." class="search-field">
+        </div>
+
+        <!-- Сетка и Форма -->
+        <div class="form-card">
+            
+            <!-- Заголовки колонок -->
+            <div class="form-header">
+                <div class="col-dest">Направление</div>
+                <div class="col-3000">3,000 тонн</div>
+                <div class="col-5000">5-6,000 тонн</div>
             </div>
-            <span class="text-[9px] font-bold bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full uppercase tracking-wider">Active</span>
+
+            <!-- Контейнер для МОРСКИХ СУДОВ -->
+            <div id="sea-routes-container"></div>
+
+            <!-- Разделитель БАРЖИ -->
+            <div class="barge-header-banner">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span>🌊</span> 
+                    <span>Barges River Terminal (Баржи)</span>
+                </div>
+                <span class="barge-banner-tag">Active</span>
+            </div>
+
+            <!-- Контейнер для БАРЖ -->
+            <div id="barge-routes-container"></div>
         </div>
 
-        <!-- Контейнер для БАРЖ -->
-        <div id="barge-routes-container" class="divide-y divide-slate-100 dark:divide-slate-800/40"></div>
+        <!-- Кнопка -->
+        <button onclick="copyToClipboardText()" class="submit-btn">
+            <span>📋</span> Скопировать ставки как текст
+        </button>
+
     </div>
 
-    <!-- Кнопка "Скопировать как текст" -->
-    <button onclick="copyToClipboardText()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2.5 transition-all duration-200 active:scale-[0.98]">
-        <span>📋</span> Скопировать тарифы как текст
-    </button>
-
-    <!-- Тост-уведомление -->
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3.5 bg-slate-900/90 dark:bg-slate-100/90 text-white dark:text-slate-900 text-xs font-bold rounded-2xl shadow-2xl opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2">
-        <span>✅</span> Тарифы успешно скопированы в буфер!
+    <!-- Тост -->
+    <div id="toast" class="toast-box">
+        <span>✅</span> Ставки успешно скопированы в буфер!
     </div>
 
     <script>
@@ -146,27 +460,12 @@
             "Egypt": "🇪🇬 Egypt", "CTZ": "🇷🇴 CTZ", "Ruse": "🇧🇬 Ruse"
         };
 
+        // Демо-данные по умолчанию
         const mockHeavy = "MRM:42u:40d,ECG:48d:22u,WCG:56u:26d,ECI:66d:31u,WCI:70u:34d,UK:145d:70u,Benghasi:58u:30d,Creta:55d:25u,Tunisia:60u:28d,Mersin:65u:-,Egypt:68d:-,CTZ:15d:15u,Ruse:15u:15d";
         const mockLight = "MRM:38d:36u,ECG:44u:20d,WCG:52d:24u,ECI:62u:29d,WCI:66d:32u,UK:135u:65d,Benghasi:52d:26u,Creta:50u:22d,Tunisia:55d:24u,Mersin:60u:-,Egypt:62d:-,CTZ:15d:15u,Ruse:15u:15d";
 
         let currentTab = 'heavy';
         let ratesData = { heavy: [], light: [] };
-
-        if (window.Telegram && window.Telegram.WebApp) {
-            const tg = window.Telegram.WebApp;
-            tg.ready();
-            tg.expand();
-            
-            const root = document.documentElement;
-            if (tg.themeParams.bg_color) root.style.setProperty('--bg-gradient-start', tg.themeParams.bg_color);
-            if (tg.themeParams.secondary_bg_color) {
-                root.style.setProperty('--bg-gradient-end', tg.themeParams.secondary_bg_color);
-                root.style.setProperty('--card-bg', tg.themeParams.secondary_bg_color);
-            }
-            if (tg.themeParams.text_color) root.style.setProperty('--text-main', tg.themeParams.text_color);
-            if (tg.themeParams.hint_color) root.style.setProperty('--text-muted', tg.themeParams.hint_color);
-            if (tg.themeParams.button_color) root.style.setProperty('--accent-color', tg.themeParams.button_color);
-        }
 
         function parseUrlData() {
             const params = new URLSearchParams(window.location.search);
@@ -189,21 +488,21 @@
                 const r6k = parts[2] || '-';
 
                 const formatCell = (str) => {
-                    if (str === '-' || !str) return { price: '-', trend: '', style: 'text-slate-300 dark:text-slate-700 bg-slate-500/5' };
+                    if (str === '-' || !str) return { price: '-', trend: '', style: 'rate-empty' };
                     let val = str;
                     let trend = '';
-                    let style = 'bg-slate-500/10 text-slate-700 dark:text-slate-300'; // Нейтральный по умолчанию
+                    let style = 'rate-neutral';
                     
                     const lastChar = str.slice(-1);
                     if (lastChar === 'u' || lastChar === 'd' || lastChar === 'n') {
                         val = str.slice(0, -1);
                         if (lastChar === 'u') {
                             trend = '↑';
-                            style = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/10';
+                            style = 'rate-up';
                         }
                         if (lastChar === 'd') {
                             trend = '↓';
-                            style = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/10';
+                            style = 'rate-down';
                         }
                     }
                     return { price: `$${val}`, trend, style };
@@ -236,31 +535,24 @@
                 const targetContainer = isBarge ? bargeContainer : seaContainer;
 
                 const row = document.createElement('div');
-                row.className = "grid grid-cols-12 p-4 items-center transition duration-150 hover:bg-slate-500/5 dark:hover:bg-slate-400/5";
+                row.className = "form-row";
                 
                 row.innerHTML = `
-                    <!-- Направление -->
-                    <div class="col-span-6 flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl shadow-inner border border-slate-200/30 dark:border-slate-700/30">
-                            ${item.flag}
-                        </div>
+                    <div class="col-dest route-cell">
+                        <div class="flag-box">${item.flag}</div>
                         <div>
-                            <span class="font-extrabold text-sm tracking-tight text-slate-800 dark:text-slate-100">${item.name}</span>
-                            <span class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">${item.code}</span>
+                            <span class="route-title">${item.name}</span>
+                            <span class="route-sub">${item.code}</span>
                         </div>
                     </div>
-                    
-                    <!-- Ставка 3,000 тонн -->
-                    <div class="col-span-3 text-center">
-                        <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl font-extrabold text-xs shadow-sm ${item.r3k.style}">
-                            ${item.r3k.price} <span class="text-[10px] font-black">${item.r3k.trend}</span>
+                    <div class="col-3000">
+                        <span class="badge-rate ${item.r3k.style}">
+                            ${item.r3k.price} <span>${item.r3k.trend}</span>
                         </span>
                     </div>
-                    
-                    <!-- Ставка 5-6,000 тонн -->
-                    <div class="col-span-3 text-center">
-                        <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl font-extrabold text-xs shadow-sm ${item.r6k.style}">
-                            ${item.r6k.price} <span class="text-[10px] font-black">${item.r6k.trend}</span>
+                    <div class="col-5000">
+                        <span class="badge-rate ${item.r6k.style}">
+                            ${item.r6k.price} <span>${item.r6k.trend}</span>
                         </span>
                     </div>
                 `;
@@ -274,11 +566,11 @@
             const btnLight = document.getElementById('btn-light');
 
             if (tab === 'heavy') {
-                btnHeavy.className = "tab-transition flex-1 py-3 text-center rounded-xl font-bold text-sm flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/10 active-glow";
-                btnLight.className = "tab-transition flex-1 py-3 text-center rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100";
+                btnHeavy.className = "tab-button active";
+                btnLight.className = "tab-button";
             } else {
-                btnLight.className = "tab-transition flex-1 py-3 text-center rounded-xl font-bold text-sm flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/10 active-glow";
-                btnHeavy.className = "tab-transition flex-1 py-3 text-center rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100";
+                btnLight.className = "tab-button active";
+                btnHeavy.className = "tab-button";
             }
 
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
