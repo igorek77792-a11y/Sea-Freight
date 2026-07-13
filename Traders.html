@@ -491,21 +491,30 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="toast-box">
+   <div id="toast" class="toast-box">
         <span>✅</span> Rates copied to clipboard!
     </div>
 
     <script>
         const FLAGS = {
-            "MRM": "🇹🇷 MRM", "ECG": "🇬🇷 ECG", "WCG": "🇬🇷 WCG", "ECI": "🇮🇹 ECI", 
-            "WCI": "🇮🇹 WCI", "UK": "🇬🇧 UK", "Benghasi": "🇱🇾 Benghasi", 
-            "Creta": "🇬🇷 Creta", "Tunisia": "🇹🇳 Tunisia", "Mersin": "🇹🇷 Mersin", 
-            "Egypt": "🇪🇬 Egypt", "CTZ": "🇷🇴 CTZ", "Ruse": "🇧🇬 Ruse"
+            "MRM": "🇹🇷 MRM",
+            "ECG": "🇬🇷 ECG",
+            "Creta": "🇬🇷 Creta",
+            "WCG": "🇬🇷 WCG",
+            "Mersin": "🇹🇷 Mersin",
+            "Egypt": "🇪🇬 Egypt",
+            "ECI": "🇮🇹 ECI",
+            "Benghasi": "🇱🇾 Benghasi",
+            "WCI": "🇮🇹 WCI",
+            "Tunisia": "🇹🇳 Tunisia",
+            "UK": "🇬🇧 UK",
+            "CTZ": "🇷🇴 CTZ",
+            "Ruse": "🇧🇬 Ruse"
         };
 
-        // Static fallback mock data
-        const mockHeavy = "MRM:42u:40d,ECG:48d:22u,WCG:56u:26d,ECI:66d:31u,WCI:70u:34d,UK:145d:70u,Benghasi:58u:30d,Creta:55d:25u,Tunisia:60u:28d,Mersin:65u:-,Egypt:68d:-,CTZ:15d:15u,Ruse:15u:15d";
-        const mockLight = "MRM:38d:36u,ECG:44u:20d,WCG:52d:24u,ECI:62u:29d,WCI:66d:32u,UK:135u:65d,Benghasi:52d:26u,Creta:50u:22d,Tunisia:55d:24u,Mersin:60u:-,Egypt:62d:-,CTZ:15d:15u,Ruse:15u:15d";
+        // Static fallback mock data (Barges at the end)
+        const mockHeavy = "MRM:42u:40d,ECG:48d:22u,Creta:55d:25u,WCG:56u:26d,Mersin:65u:-,Egypt:68d:-,ECI:66d:31u,Benghasi:58u:30d,WCI:70u:34d,Tunisia:60u:28d,UK:145d:70u,CTZ:15d:15u,Ruse:15u:15d";
+        const mockLight = "MRM:38d:36u,ECG:44u:20d,Creta:50u:22d,WCG:52d:24u,Mersin:60u:-,Egypt:62d:-,ECI:62u:29d,Benghasi:52d:26u,WCI:66d:32u,Tunisia:55d:24u,UK:135u:65d,CTZ:15d:15u,Ruse:15u:15d";
 
         let currentTab = 'heavy';
         let ratesData = { heavy: [], light: [] };
