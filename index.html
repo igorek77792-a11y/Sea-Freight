@@ -2,174 +2,345 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Freight Rates — Giurgiulești</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ввод ставок фрахта — Джурджулешты</title>
+    <!-- Подключаем Tailwind CSS для премиального внешнего вида -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключаем SDK Telegram -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #f4f6f9; color: #2c3e50; padding: 12px; margin: 0; }
-        h2 { font-size: 22px; font-weight: 700; margin: 10px 0 2px 0; color: #000; }
-        .date { font-size: 13px; color: #8e8e93; margin-bottom: 15px; }
-        .sub-header { font-size: 18px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; }
-        .sub-header span { margin-right: 6px; }
-        
-        .tabs { display: flex; background: #e5e5ea; padding: 2px; border-radius: 8px; margin-bottom: 15px; }
-        .tab { flex: 1; text-align: center; padding: 8px 0; font-size: 14px; font-weight: 600; border-radius: 6px; cursor: pointer; color: #8e8e93; }
-        .tab.active { background: white; color: #000; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-
-        .table-container { background: #d0dee8; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .table-header-bar { background: #9bb3c6; color: #4a657a; padding: 6px 12px; font-size: 13px; display: flex; justify-content: space-between; }
-        .grid-table { background: #e3edf3; padding: 10px 12px; }
-        .grid-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #cbdbe6; }
-        .grid-row:last-child { border-bottom: none; }
-        .grid-row.th { font-weight: bold; font-size: 13px; color: #5b7285; border-bottom: 2px solid #b4cbda; padding-bottom: 8px; }
-        
-        .col-route { flex: 2; display: flex; align-items: center; font-size: 13px; color: #2c445a; font-weight: 600; }
-        .col-route span { margin-right: 6px; font-size: 15px; display: inline-block; width: 20px; text-align: center; }
-        .col-val { flex: 1; text-align: center; }
-        
-        input { width: 85%; max-width: 70px; padding: 5px; border: 1px solid #b4cbda; border-radius: 4px; text-align: center; font-size: 13px; background: #f4f7f9; color: #2c445a; font-weight: bold; }
-        input:focus { border-color: #4a657a; outline: none; background: white; }
-        
-        button { width: 100%; padding: 14px; background: #3478f6; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 30px; }
-        button:hover { background: #2662d9; }
-        
-        .hidden { display: none; }
-        .section-divider { font-weight: bold; font-size: 12px; color: #4a657a; padding: 8px 0 4px 0; border-bottom: 1px dashed #b4cbda; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        :root {
+            --tg-bg: #f4f6f9;
+            --tg-card-bg: #ffffff;
+            --tg-text: #1f2937;
+            --tg-border: #e5e7eb;
+            --tg-accent: #2563eb;
+        }
+        body {
+            background-color: var(--tg-bg);
+            color: var(--tg-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .custom-card {
+            background-color: var(--tg-card-bg);
+            border: 1px solid var(--tg-border);
+        }
+        /* Анимация переключения вкладок */
+        .tab-transition {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
     </style>
 </head>
-<body>
+<body class="p-4 min-h-screen pb-24 flex flex-col justify-between">
 
-    <h2>Freight Rates — Giurgiulești</h2>
-    <div class="date" id="currentDate">Понедельник</div>
-    
-    <div class="sub-header"><span>⚡</span> Today</div>
+    <div>
+        <!-- Шапка -->
+        <!-- -->
+        <div class="mb-5 text-center">
+            <h1 class="text-xl font-black tracking-tight" id="main-title">📝 Ввод ставок фрахта</h1>
+            <p class="text-xs font-semibold text-gray-400 mt-1 uppercase tracking-wider">Джурджулешты</p>
+        </div>
 
-    <div class="tabs">
-        <div class="tab active" id="tabHeavy" onclick="switchTab('heavy')">Тяжелый груз (Heavy)</div>
-        <div class="tab" id="tabLight" onclick="switchTab('light')">Легкий груз (Light)</div>
+        <!-- Переключатель типа груза (Heavy / Light) -->
+        <div class="flex p-1 rounded-xl bg-gray-200/70 mb-5 custom-card">
+            <button type="button" id="btn-heavy" onclick="switchTab('heavy')" class="tab-transition flex-1 py-2.5 text-center rounded-lg font-bold text-xs flex items-center justify-center gap-1 bg-white text-gray-800 shadow-sm">
+                🚢 Heavy (Тяжелый)
+            </button>
+            <button type="button" id="btn-light" onclick="switchTab('light')" class="tab-transition flex-1 py-2.5 text-center rounded-lg font-bold text-xs flex items-center justify-center gap-1 text-gray-500 hover:text-gray-800">
+                🌾 Light (Легкий)
+            </button>
+        </div>
+
+        <!-- Форма ввода -->
+        <!-- -->
+        <form id="ratesForm" onsubmit="submitForm(event)">
+            
+            <!-- БЛОК HEAVY -->
+            <div id="blockHeavy" class="space-y-3">
+                <div class="rounded-2xl p-4 shadow-sm custom-card space-y-4">
+                    
+                    <!-- Заголовок таблицы -->
+                    <div class="grid grid-cols-12 text-[10px] font-black uppercase tracking-wider text-gray-400 border-b border-gray-100 pb-2">
+                        <div class="col-span-6">Направление</div>
+                        <div class="col-span-3 text-center">3,000t</div>
+                        <div class="col-span-3 text-center">5-6,000t</div>
+                    </div>
+
+                    <!-- РЕЧНЫЕ БАРЖИ (Heavy) -->
+                    <div class="barge-section space-y-4">
+                        <div class="text-[11px] font-extrabold text-blue-600 uppercase tracking-wider bg-blue-50/50 p-2 rounded-lg barge-title">🌾 Речные баржи (Barges)</div>
+                        
+                        <div class="grid grid-cols-12 items-center gap-2 barge-row">
+                            <div class="col-span-6 font-bold text-sm">🇷🇴 CTZ</div>
+                            <div class="col-span-3"><input type="number" id="heavy_CTZ_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_CTZ_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 barge-row">
+                            <div class="col-span-6 font-bold text-sm">🇧🇬 Ruse</div>
+                            <div class="col-span-3"><input type="number" id="heavy_Ruse_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_Ruse_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                    </div>
+
+                    <!-- МОРСКИЕ СУДА (Heavy) -->
+                    <div class="sea-section space-y-4">
+                        <div class="text-[11px] font-extrabold text-indigo-600 uppercase tracking-wider bg-indigo-50/50 p-2 rounded-lg sea-title">🚢 Морские суда (Coasters)</div>
+                        
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇹🇷 MRM</div>
+                            <div class="col-span-3"><input type="number" id="heavy_MRM_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_MRM_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇬🇷 ECG</div>
+                            <div class="col-span-3"><input type="number" id="heavy_ECG_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_ECG_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇬🇷 Creta</div>
+                            <div class="col-span-3"><input type="number" id="heavy_Creta_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_Creta_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇬🇷 WCG</div>
+                            <div class="col-span-3"><input type="number" id="heavy_WCG_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_WCG_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇹🇷 Mersin</div>
+                            <div class="col-span-3"><input type="number" id="heavy_Mersin_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_Mersin_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇪🇬 Egypt</div>
+                            <div class="col-span-3"><input type="number" id="heavy_Egypt_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_Egypt_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇮🇹 ECI</div>
+                            <div class="col-span-3"><input type="number" id="heavy_ECI_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_ECI_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇱🇾 Benghasi</div>
+                            <div class="col-span-3"><input type="number" id="heavy_Benghasi_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_Benghasi_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇮🇹 WCI</div>
+                            <div class="col-span-3"><input type="number" id="heavy_WCI_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_WCI_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇹🇳 Tunisia</div>
+                            <div class="col-span-3"><input type="number" id="heavy_Tunisia_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_Tunisia_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇬🇧 UK</div>
+                            <div class="col-span-3"><input type="number" id="heavy_UK_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="heavy_UK_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- БЛОК LIGHT -->
+            <!-- -->
+            <div id="blockLight" class="space-y-3 hidden">
+                <div class="rounded-2xl p-4 shadow-sm custom-card space-y-4">
+                    
+                    <!-- Заголовок таблицы -->
+                    <div class="grid grid-cols-12 text-[10px] font-black uppercase tracking-wider text-gray-400 border-b border-gray-100 pb-2">
+                        <div class="col-span-6">Направление</div>
+                        <div class="col-span-3 text-center">3,000t</div>
+                        <div class="col-span-3 text-center">5-6,000t</div>
+                    </div>
+
+                    <!-- РЕЧНЫЕ БАРЖИ (Light) -->
+                    <div class="barge-section space-y-4">
+                        <div class="text-[11px] font-extrabold text-blue-600 uppercase tracking-wider bg-blue-50/50 p-2 rounded-lg barge-title">🌾 Речные баржи (Barges)</div>
+                        
+                        <div class="grid grid-cols-12 items-center gap-2 barge-row">
+                            <div class="col-span-6 font-bold text-sm">🇷🇴 CTZ</div>
+                            <div class="col-span-3"><input type="number" id="light_CTZ_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_CTZ_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 barge-row">
+                            <div class="col-span-6 font-bold text-sm">🇧🇬 Ruse</div>
+                            <div class="col-span-3"><input type="number" id="light_Ruse_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_Ruse_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                    </div>
+
+                    <!-- МОРСКИЕ СУДА (Light) -->
+                    <div class="sea-section space-y-4">
+                        <div class="text-[11px] font-extrabold text-indigo-600 uppercase tracking-wider bg-indigo-50/50 p-2 rounded-lg sea-title">🚢 Морские суда (Coasters)</div>
+                        
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇹🇷 MRM</div>
+                            <div class="col-span-3"><input type="number" id="light_MRM_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_MRM_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇬🇷 ECG</div>
+                            <div class="col-span-3"><input type="number" id="light_ECG_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_ECG_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇬🇷 Creta</div>
+                            <div class="col-span-3"><input type="number" id="light_Creta_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_Creta_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇬🇷 WCG</div>
+                            <div class="col-span-3"><input type="number" id="light_WCG_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_WCG_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇹🇷 Mersin</div>
+                            <div class="col-span-3"><input type="number" id="light_Mersin_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_Mersin_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇪🇬 Egypt</div>
+                            <div class="col-span-3"><input type="number" id="light_Egypt_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_Egypt_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇮🇹 ECI</div>
+                            <div class="col-span-3"><input type="number" id="light_ECI_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_ECI_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇱🇾 Benghasi</div>
+                            <div class="col-span-3"><input type="number" id="light_Benghasi_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_Benghasi_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇮🇹 WCI</div>
+                            <div class="col-span-3"><input type="number" id="light_WCI_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_WCI_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇹🇳 Tunisia</div>
+                            <div class="col-span-3"><input type="number" id="light_Tunisia_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_Tunisia_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-12 items-center gap-2 sea-row">
+                            <div class="col-span-6 font-bold text-sm">🇬🇧 UK</div>
+                            <div class="col-span-3"><input type="number" id="light_UK_3000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                            <div class="col-span-3"><input type="number" id="light_UK_6000" placeholder="—" class="w-full text-center py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопка "ОТПРАВИТЬ СТАВКИ" -->
+            <!-- -->
+            <div class="fixed bottom-0 left-0 right-0 p-4 bg-gray-50/90 border-t border-gray-200 backdrop-blur-sm z-50">
+                <button type="submit" class="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] transition duration-150 text-white font-black text-sm shadow-md flex items-center justify-center gap-2">
+                    🚀 Отправить котировки боту
+                </button>
+            </div>
+        </form>
     </div>
-    
-<form id="ratesForm">
-        <div id="blockHeavy" class="table-container">
-            <div class="table-header-bar"><div>Морские и речные направления (Heavy)</div><div>📋</div></div>
-            <div class="grid-table">
-                <div class="grid-row th"><div class="col-route">Route</div><div class="col-val">3,000t</div><div class="col-val">5–6,000t</div></div>
-                
-                <div class="section-divider sea-title">🚢 Морские суда</div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇹🇷</span>MARMARA MRM</div><div class="col-val"><input type="number" id="heavy_MRM_3000"></div><div class="col-val"><input type="number" id="heavy_MRM_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇬🇷</span>ECG</div><div class="col-val"><input type="number" id="heavy_ECG_3000"></div><div class="col-val"><input type="number" id="heavy_ECG_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇬🇷</span>Creta</div><div class="col-val"><input type="number" id="heavy_Creta_3000"></div><div class="col-val"><input type="number" id="heavy_Creta_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇬🇷</span>WCG</div><div class="col-val"><input type="number" id="heavy_WCG_3000"></div><div class="col-val"><input type="number" id="heavy_WCG_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇹🇷</span>Mersin</div><div class="col-val"><input type="number" id="heavy_Mersin_3000"></div><div class="col-val"><input type="number" id="heavy_Mersin_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇪🇬</span>Egypt</div><div class="col-val"><input type="number" id="heavy_Egypt_3000"></div><div class="col-val"><input type="number" id="heavy_Egypt_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇮🇹</span>ECI</div><div class="col-val"><input type="number" id="heavy_ECI_3000"></div><div class="col-val"><input type="number" id="heavy_ECI_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇱🇾</span>Benghasi</div><div class="col-val"><input type="number" id="heavy_Benghasi_3000"></div><div class="col-val"><input type="number" id="heavy_Benghasi_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇮🇹</span>WCI</div><div class="col-val"><input type="number" id="heavy_WCI_3000"></div><div class="col-val"><input type="number" id="heavy_WCI_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇹🇳</span>Tunisia</div><div class="col-val"><input type="number" id="heavy_Tunisia_3000"></div><div class="col-val"><input type="number" id="heavy_Tunisia_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇬🇧</span>UK</div><div class="col-val"><input type="number" id="heavy_UK_3000"></div><div class="col-val"><input type="number" id="heavy_UK_6000"></div></div>
-                
-                <div class="section-divider barge-title">🌾 Речные баржи</div>
-                <div class="grid-row barge-row"><div class="col-route"><span>🇷🇴</span>Constanza CTZ</div><div class="col-val"><input type="number" id="heavy_CTZ_3000"></div><div class="col-val"><input type="number" id="heavy_CTZ_6000"></div></div>
-                <div class="grid-row barge-row"><div class="col-route"><span>🇧🇬</span>Ruse</div><div class="col-val"><input type="number" id="heavy_Ruse_3000"></div><div class="col-val"><input type="number" id="heavy_Ruse_6000"></div></div>
-            </div>
-        </div>
 
-        <div id="blockLight" class="table-container hidden">
-            <div class="table-header-bar"><div>Морские и речные направления (Light)</div><div>📋</div></div>
-            <div class="grid-table">
-                <div class="grid-row th"><div class="col-route">Route</div><div class="col-val">3,000t</div><div class="col-val">5–6,000t</div></div>
-                
-                <div class="section-divider sea-title">🚢 Морские суда</div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇹🇷</span>MARMARA MRM</div><div class="col-val"><input type="number" id="light_MRM_3000"></div><div class="col-val"><input type="number" id="light_MRM_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇬🇷</span>ECG</div><div class="col-val"><input type="number" id="light_ECG_3000"></div><div class="col-val"><input type="number" id="light_ECG_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇬🇷</span>Creta</div><div class="col-val"><input type="number" id="light_Creta_3000"></div><div class="col-val"><input type="number" id="light_Creta_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇬🇷</span>WCG</div><div class="col-val"><input type="number" id="light_WCG_3000"></div><div class="col-val"><input type="number" id="light_WCG_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇹🇷</span>Mersin</div><div class="col-val"><input type="number" id="light_Mersin_3000"></div><div class="col-val"><input type="number" id="light_Mersin_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇪🇬</span>Egypt</div><div class="col-val"><input type="number" id="light_Egypt_3000"></div><div class="col-val"><input type="number" id="light_Egypt_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇮🇹</span>ECI</div><div class="col-val"><input type="number" id="light_ECI_3000"></div><div class="col-val"><input type="number" id="light_ECI_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇱🇾</span>Benghasi</div><div class="col-val"><input type="number" id="light_Benghasi_3000"></div><div class="col-val"><input type="number" id="light_Benghasi_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇮🇹</span>WCI</div><div class="col-val"><input type="number" id="light_WCI_3000"></div><div class="col-val"><input type="number" id="light_WCI_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇹🇳</span>Tunisia</div><div class="col-val"><input type="number" id="light_Tunisia_3000"></div><div class="col-val"><input type="number" id="light_Tunisia_6000"></div></div>
-                <div class="grid-row sea-row"><div class="col-route"><span>🇬🇧</span>UK</div><div class="col-val"><input type="number" id="light_UK_3000"></div><div class="col-val"><input type="number" id="light_UK_6000"></div></div>
-                
-                <div class="section-divider barge-title">🌾 Речные баржи</div>
-                <div class="grid-row barge-row"><div class="col-route"><span>🇷🇴</span>Constanza CTZ</div><div class="col-val"><input type="number" id="light_CTZ_3000"></div><div class="col-val"><input type="number" id="light_CTZ_6000"></div></div>
-                <div class="grid-row barge-row"><div class="col-route"><span>🇧🇬</span>Ruse</div><div class="col-val"><input type="number" id="light_Ruse_3000"></div><div class="col-val"><input type="number" id="light_Ruse_6000"></div></div>
-            </div>
-        </div>
-    </form>
+    <!-- ТИНАТОР-ОТЛАДЧИК В САМОМ НИЗУ СТРАНИЦЫ (чтобы всегда видеть, дошла ли роль) -->
+    <div id="debug-footer" class="text-[9px] text-gray-400 font-mono text-center mt-6 pb-2 opacity-60">
+        Проверка URL...
+    </div>
 
-        <button type="button" onclick="sendData()">Отправить котировки в бот</button>
-    </form>
+    <!-- -->
+    <script>
+        // Инициализируем Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    // Железобетонное разделение формы для МОРЯ и БАРЖ
-const urlParams = new URLSearchParams(window.location.search);
-const brokerType = urlParams.get('type');
+        let currentTab = 'heavy';
 
-if (brokerType === 'sea') {
-    // Морской брокер: собираем ВСЕ элементы барж и скрываем их циклом for
-    var bargeTitles = document.getElementsByClassName('barge-title');
-    var bargeRows = document.getElementsByClassName('barge-row');
-    
-    for (var i = 0; i < bargeTitles.length; i++) {
-        bargeTitles[i].style.setProperty('display', 'none', 'important');
-    }
-    for (var j = 0; j < bargeRows.length; j++) {
-        bargeRows[j].style.setProperty('display', 'none', 'important');
-    }
-} else if (brokerType === 'barge') {
-    // Баржевый брокер: собираем ВСЕ элементы моря и скрываем их циклом for
-    var seaTitles = document.getElementsByClassName('sea-title');
-    var seaRows = document.getElementsByClassName('sea-row');
-    
-    for (var k = 0; k < seaTitles.length; k++) {
-        seaTitles[k].style.setProperty('display', 'none', 'important');
-    }
-    for (var l = 0; l < seaRows.length; l++) {
-        seaRows[l].style.setProperty('display', 'none', 'important');
-    }
-}
+        // ЧИТАЕМ ПАРАМЕТРЫ РОЛИ ИЗ URL СТРОГО И БЕЗ РЕДИРЕКТОВ
+        const urlParams = new URLSearchParams(window.location.search);
+        const role = urlParams.get('role'); // sea / barge
 
-    const options = { day: 'numeric', month: 'long', year: 'numeric' };
-    document.getElementById('currentDate').innerText = new Date().toLocaleDateString('ru-RU', options);
+        // Выводим данные в мини-отладчик на экране брокера
+        document.getElementById('debug-footer').innerText = `🔗 URL Query: ${window.location.search} | Detected Role: ${role || 'None'}`;
 
-    function switchTab(type) {
-        if (type === 'heavy') {
-            document.getElementById('tabHeavy').classList.add('active');
-            document.getElementById('tabLight').classList.remove('active');
-            document.getElementById('blockHeavy').classList.remove('hidden');
-            document.getElementById('blockLight').classList.add('hidden');
-        } else {
-            document.getElementById('tabLight').classList.add('active');
-            document.getElementById('tabHeavy').classList.remove('active');
-            document.getElementById('blockLight').classList.remove('hidden');
-            document.getElementById('blockHeavy').classList.add('hidden');
+        if (role === 'sea') {
+            document.querySelectorAll('.barge-title, .barge-row, .barge-section').forEach(el => el.style.display = 'none');
+            document.getElementById('main-title').innerText = '🚢 Ставки морских судов';
+        } else if (role === 'barge') {
+            document.querySelectorAll('.sea-title, .sea-row, .sea-section').forEach(el => el.style.display = 'none');
+            document.getElementById('main-title').innerText = '🌾 Ставки речных барж';
         }
-    }
 
-    function sendData() {
-        const formData = {};
-        const inputs = document.querySelectorAll('input');
-        
-        inputs.forEach(input => {
-            // Собираем данные по input.id (убедись, что id у полей имеют вид типа heavy_MRM_3000)
-            if (input.value && input.id) {
-                formData[input.id] = parseFloat(input.value);
+        // Переключение между вкладками Heavy и Light
+        function switchTab(tab) {
+            currentTab = tab;
+            const btnHeavy = document.getElementById('btn-heavy');
+            const btnLight = document.getElementById('btn-light');
+            const blockHeavy = document.getElementById('blockHeavy');
+            const blockLight = document.getElementById('blockLight');
+
+            if (tab === 'heavy') {
+                btnHeavy.className = "tab-transition flex-1 py-2.5 text-center rounded-lg font-bold text-xs flex items-center justify-center gap-1 bg-white text-gray-800 shadow-sm";
+                btnLight.className = "tab-transition flex-1 py-2.5 text-center rounded-lg font-bold text-xs flex items-center justify-center gap-1 text-gray-500 hover:text-gray-800";
+                blockHeavy.classList.remove('hidden');
+                blockLight.classList.add('hidden');
+            } else {
+                btnLight.className = "tab-transition flex-1 py-2.5 text-center rounded-lg font-bold text-xs flex items-center justify-center gap-1 bg-white text-gray-800 shadow-sm";
+                btnHeavy.className = "tab-transition flex-1 py-2.5 text-center rounded-lg font-bold text-xs flex items-center justify-center gap-1 text-gray-500 hover:text-gray-800";
+                blockLight.classList.remove('hidden');
+                blockHeavy.classList.add('hidden');
             }
-        });
 
-        if (Object.keys(formData).length === 0) {
-            alert("Пожалуйста, заполните хотя бы одну ставку.");
-            return;
+            // Пытаемся сохранить скрытие ролей при переключении табов
+            if (role === 'sea') {
+                document.querySelectorAll('.barge-title, .barge-row, .barge-section').forEach(el => el.style.display = 'none');
+            } else if (role === 'barge') {
+                document.querySelectorAll('.sea-title, .sea-row, .sea-section').forEach(el => el.style.display = 'none');
+            }
+
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
         }
 
-        // Отправляем данные в бот
-        tg.sendData(JSON.stringify(formData));
-        tg.close();
-    }
-</script>
+        // Сбор и отправка данных в бота
+        function submitForm(event) {
+            event.preventDefault();
+            
+            const inputs = document.querySelectorAll('input[type="number"]');
+            const data = {};
+
+            inputs.forEach(input => {
+                // Игнорируем скрытые (в зависимости от роли) поля ввода
+                let parentRow = input.closest('.sea-row') || input.closest('.barge-row');
+                if (parentRow && parentRow.style.display === 'none') {
+                    return; 
+                }
+
+                if (input.value && input.value.trim() !== '') {
+                    data[input.id] = input.value;
+                }
+            });
+
+            if (Object.keys(data).length === 0) {
+                tg.showPopup({
+                    title: '⚠️ Пустая форма',
+                    message: 'Пожалуйста, заполните хотя бы одну ставку перед отправкой.'
+                });
+                return;
+            }
+
+            // Отправляем JSON боту и закрываем окно формы
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+        }
+    </script>
 </body>
 </html>
