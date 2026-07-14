@@ -1,502 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Freight Rates — Giurgiulești Hub</title>
+    <title>Freight Rates — Giurgiulești</title>
+    <!-- Подключаем Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <style>
-        /* Premium color palette with system-aware light & dark themes */
         :root {
-            --bg-gradient-start: #f0f9ff; /* Soft sky blue */
-            --bg-gradient-end: #e0f2fe;   /* Light blue */
-            --card-bg: #ffffff;           /* Clean white */
-            --text-main: #0f172a;         /* Deep slate */
-            --text-muted: #475569;        /* Medium slate */
-            --border-color: #cbd5e1;      /* Soft borders */
-            --tab-bg: #e2e8f0;            /* Track background */
-            --tab-active: #ffffff;        /* Active tab background */
-            --tab-active-text: #0284c7;   /* Active tab text (Sky blue) */
-            --input-bg: #ffffff;
-            --shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.08), 0 8px 10px -6px rgba(2, 132, 199, 0.08);
-            --badge-empty: #f1f5f9;
-            --badge-neutral: #f8fafc;
+            --tg-bg: #f4f6f9;
+            --tg-card-bg: #ffffff;
+            --tg-text: #1f2937;
+            --tg-border: #e5e7eb;
+            --tg-accent: #2563eb;
         }
-
-        /* Dark Mode overrides */
-        .dark {
-            --bg-gradient-start: #0f172a; /* Dark slate */
-            --bg-gradient-end: #020617;   /* Almost black */
-            --card-bg: #1e293b;           /* Card background */
-            --text-main: #f8fafc;         /* Bright light text */
-            --text-muted: #94a3b8;        /* Muted gray */
-            --border-color: #334155;      /* Dark border */
-            --tab-bg: #0f172a;            /* Tab track */
-            --tab-active: #334155;        /* Active tab */
-            --tab-active-text: #38bdf8;   /* Bright blue active text */
-            --input-bg: #0f172a;          /* Dark input */
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-            --badge-empty: #334155;
-            --badge-neutral: #1e293b;
-        }
-
-        /* Smooth state transitions */
-        body, .form-card, .form-row, .tabs-wrapper, .tab-button, .search-field, .barge-header-banner, .flag-box, .badge-rate, .theme-toggle-btn, .date-badge, .submit-btn {
-            transition: background 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        /* Base styles */
         body {
-            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
-            color: var(--text-main);
+            background-color: var(--tg-bg);
+            color: var(--tg-text);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            padding: 16px;
-            min-height: 100vh;
             -webkit-user-select: none;
             user-select: none;
-            box-sizing: border-box;
         }
-
-        .container {
-            max-width: 550px;
-            margin: 0 auto;
+        .custom-card {
+            background-color: var(--tg-card-bg);
+            border: 1px solid var(--tg-border);
         }
-
-        /* Dashboard Header */
-        .header-section {
-            display: flex;
-            align-items: center;
-            margin-bottom: 24px;
-            justify-content: space-between;
-        }
-
-        .header-title-box {
-            display: flex;
-            align-items: center;
-        }
-
-        .header-logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
-            margin-right: 12px;
-        }
-
-        .main-title {
-            font-size: 22px;
-            font-weight: 900;
-            margin: 0;
-            letter-spacing: -0.02em;
-            color: #0284c7;
-        }
-        
-        .dark .main-title {
-            color: #38bdf8;
-        }
-
-        .sub-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: 2px;
-        }
-
-        .date-badge {
-            font-size: 11px;
-            font-weight: 800;
-            padding: 6px 12px;
-            border-radius: 20px;
-            background-color: var(--badge-neutral);
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-        }
-
-        /* Theme toggle button */
-        .theme-toggle-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            font-size: 16px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            outline: none;
-        }
-
-        .theme-toggle-btn:active {
-            transform: scale(0.9);
-        }
-
-        /* Segmented control tabs */
-        .tabs-wrapper {
-            display: flex;
-            background-color: var(--tab-bg);
-            padding: 4px;
-            border-radius: 14px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-        }
-
-        .tab-button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            background: none;
-            font-weight: 800;
-            font-size: 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .tab-button.active {
-            background-color: var(--tab-active);
-            color: var(--tab-active-text);
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.1);
-        }
-
-        /* Search Bar */
-        .search-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .search-field {
-            width: 100%;
-            padding: 14px 16px 14px 44px;
-            border-radius: 14px;
-            border: 1px solid var(--border-color);
-            background-color: var(--input-bg);
-            color: var(--text-main);
-            font-size: 14px;
-            font-weight: 600;
-            box-sizing: border-box;
-            outline: none;
-        }
-
-        .search-field:focus {
-            border-color: #0284c7;
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
-        }
-
-        .search-icon-svg {
-            position: absolute;
-            left: 16px;
-            top: 15px;
-            font-size: 15px;
-            color: var(--text-muted);
-        }
-
-        /* Responsive Freight Grid */
-        .form-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            margin-bottom: 24px;
-        }
-
-        .form-header {
-            display: flex;
-            padding: 14px 16px;
-            background-color: rgba(0, 0, 0, 0.015);
-            border-bottom: 1px solid var(--border-color);
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-        }
-
-        .col-dest {
-            flex: 6;
-        }
-
-        .col-3000 {
-            flex: 3;
-            text-align: center;
-        }
-
-        .col-5000 {
-            flex: 3;
-            text-align: center;
-        }
-
-        .form-row {
-            display: flex;
-            align-items: center;
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .form-row:last-child {
-            border-bottom: none;
-        }
-
-        .route-cell {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .flag-box {
-            font-size: 22px;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.03);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-        }
-
-        .route-title {
-            font-weight: 800;
-            font-size: 15px;
-            letter-spacing: -0.01em;
-            color: var(--text-main);
-        }
-
-        .route-sub {
-            display: block;
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-top: 2px;
-        }
-
-        /* Price tag statuses (Highly contrasted) */
-        .badge-rate {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 8px 14px;
-            border-radius: 10px;
-            font-weight: 800;
-            font-size: 14px;
-            min-width: 76px;
-            box-sizing: border-box;
-        }
-
-        .rate-empty {
-            background-color: var(--badge-empty);
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .rate-neutral {
-            background-color: var(--badge-neutral);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-        }
-
-        /* 🟢 UP trend (price ↑) -> Bad for trader -> RED badge */
-        .rate-up-red {
-            background-color: #fee2e2 !important; 
-            color: #b91c1c !important;         
-            border: 1px solid #fca5a5 !important;
-        }
-
-        .dark .rate-up-red {
-            background-color: rgba(239, 68, 68, 0.18) !important;
-            color: #fca5a5 !important;
-            border: 1px solid rgba(239, 68, 68, 0.3) !important;
-        }
-
-        /* 🔴 DOWN trend (price ↓) -> Great for trader -> GREEN badge */
-        .rate-down-green {
-            background-color: #dcfce7 !important; 
-            color: #15803d !important;         
-            border: 1px solid #86efac !important;
-        }
-
-        .dark .rate-down-green {
-            background-color: rgba(16, 185, 129, 0.18) !important;
-            color: #86efac !important;
-            border: 1px solid rgba(16, 185, 129, 0.3) !important;
-        }
-
-        /* River Barges banner */
-        .barge-header-banner {
-            background: linear-gradient(90deg, rgba(2, 132, 199, 0.08) 0%, rgba(2, 132, 199, 0.02) 100%);
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 12px 16px;
-            font-size: 12px;
-            font-weight: 800;
-            color: #0284c7;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .dark .barge-header-banner {
-            background: linear-gradient(90deg, rgba(56, 189, 248, 0.08) 0%, rgba(56, 189, 248, 0.02) 100%);
-            color: #38bdf8;
-        }
-
-        .barge-banner-tag {
-            font-size: 9px;
-            font-weight: 900;
-            background-color: #0284c7;
-            color: #ffffff;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
-
-        .dark .barge-banner-tag {
-            background-color: #38bdf8;
-            color: #0f172a;
-        }
-
-        /* Action button */
-        .submit-btn {
-            width: 100%;
-            padding: 16px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 15px;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
-        }
-
-        .submit-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Toast Popup */
-        .toast-box {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #0f172a;
-            color: #ffffff;
-            font-size: 13px;
-            font-weight: 700;
-            padding: 12px 24px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 9999;
-        }
-
-        .dark .toast-box {
-            background-color: #f8fafc;
-            color: #0f172a;
+        .tab-transition {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
-<body>
+<body class="p-4 min-h-screen">
 
-    <div class="container">
+    <!-- Шапка -->
+    <!-- -->
+    <div class="mb-5 text-center">
+        <h1 class="text-xl font-black tracking-tight">📊 Freight Rates</h1>
+        <p class="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-wider" id="date-label">Загрузка...</p>
+    </div>
 
-        <!-- Header -->
-        <div class="header-section">
-            <div class="header-title-box">
-                <div class="header-logo">🚢</div>
-                <div>
-                    <h1 class="main-title">Freight Rates</h1>
-                    <div class="sub-title">Giurgiulești Hub</div>
-                </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">☀️</button>
-                <div id="date-label" class="date-badge">Loading...</div>
-            </div>
-        </div>
-
-        <!-- Cargo switch tabs -->
-        <div class="tabs-wrapper">
-            <button id="btn-heavy" onclick="switchTab('heavy')" class="tab-button active">
-                <span>🚢</span> Heavy Cargo
-            </button>
-            <button id="btn-light" onclick="switchTab('light')" class="tab-button">
-                <span>🌾</span> Light Cargo
-            </button>
-        </div>
-
-        <!-- Search input -->
-        <div class="search-container">
-            <span class="search-icon-svg">🔍</span>
-            <input type="text" id="search-input" oninput="filterRoutes()" placeholder="Search destination..." class="search-field">
-        </div>
-
-        <!-- Freight Card -->
-        <div class="form-card">
-            
-            <!-- Table headers -->
-            <div class="form-header">
-                <div class="col-dest">Destination</div>
-                <div class="col-3000">3,000 Tons</div>
-                <div class="col-5000">5-6,000 Tons</div>
-            </div>
-
-            <!-- Sea routes container -->
-            <div id="sea-routes-container"></div>
-
-            <!-- River terminal separator -->
-            <div class="barge-header-banner">
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    <span>🌊</span> 
-                    <span>Barges (River Terminal)</span>
-                </div>
-                <span class="barge-banner-tag">Active</span>
-            </div>
-
-            <!-- River barges container -->
-            <div id="barge-routes-container"></div>
-        </div>
-
-        <!-- Action Button -->
-        <button onclick="copyToClipboardText()" class="submit-btn">
-            <span>📋</span> Copy Rates as Text
+    <!-- Переключатель типа груза -->
+    <div class="flex p-1 rounded-xl bg-gray-200/70 mb-5 custom-card">
+        <button id="btn-heavy" onclick="switchTab('heavy')" class="tab-transition flex-1 py-2.5 text-center rounded-lg font-bold text-xs flex items-center justify-center gap-1 bg-white text-gray-800 shadow-sm">
+            🚢 Heavy (Тяжелый)
         </button>
-
+        <button id="btn-light" onclick="switchTab('light')" class="tab-transition flex-1 py-2.5 text-center rounded-lg font-bold text-xs flex items-center justify-center gap-1 text-gray-500 hover:text-gray-800">
+            🌾 Light (Легкий)
+        </button>
     </div>
 
-    <!-- Toast Notification -->
-   <div id="toast" class="toast-box">
-        <span>✅</span> Rates copied to clipboard!
+    <!-- Быстрый поиск -->
+    <div class="mb-4 relative">
+        <input type="text" id="search-input" oninput="filterRoutes()" placeholder="🔍 Быстрый поиск направления..." 
+               class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-bold custom-card">
     </div>
 
+    <!-- Таблица ставок -->
+    <!-- -->
+    <div class="rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-6 custom-card">
+        
+        <!-- Заголовок таблицы -->
+        <div class="grid grid-cols-12 bg-gray-50/70 border-b border-gray-100 p-3 text-[10px] font-black uppercase tracking-wider text-gray-400">
+            <div class="col-span-6">Направление</div>
+            <div class="col-span-3 text-center">3,000t</div>
+            <div class="col-span-3 text-center">5-6,000t</div>
+        </div>
+
+        <!-- Раздел: Морские суда -->
+        <div id="sea-routes-container" class="divide-y divide-gray-100"></div>
+
+        <!-- Раздел: Речные баржи -->
+        <div class="bg-blue-50/40 border-y border-blue-100/50 p-2.5 px-4 text-[11px] font-black text-blue-600 uppercase tracking-wider">
+            🌾 Речные баржи (Barges)
+        </div>
+        <div id="barge-routes-container" class="divide-y divide-gray-100"></div>
+    </div>
+
+    <!-- Кнопка "Скопировать как текст" -->
+    <!-- -->
+    <button onclick="copyToClipboardText()" class="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition duration-200 active:scale-[0.98]">
+        📋 Скопировать тарифы текстом
+    </button>
+
+    <!-- Всплывающее уведомление -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 bg-black/80 text-white text-xs font-bold rounded-xl shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 flex items-center gap-2">
+        <span>✅</span> Ставки скопированы!
+    </div>
+
+    <!-- -->
     <script>
         const FLAGS = {
+            "CTZ": "🇷🇴 CTZ",
+            "Ruse": "🇧🇬 Ruse",
             "MRM": "🇹🇷 MRM",
             "ECG": "🇬🇷 ECG",
             "Creta": "🇬🇷 Creta",
@@ -507,46 +104,35 @@
             "Benghasi": "🇱🇾 Benghasi",
             "WCI": "🇮🇹 WCI",
             "Tunisia": "🇹🇳 Tunisia",
-            "UK": "🇬🇧 UK",
-            "CTZ": "🇷🇴 CTZ",
-            "Ruse": "🇧🇬 Ruse"
+            "UK": "🇬🇧 UK"
         };
 
-        // Static fallback mock data (Barges at the end)
-        const mockHeavy = "MRM:42u:40d,ECG:48d:22u,Creta:55d:25u,WCG:56u:26d,Mersin:65u:-,Egypt:68d:-,ECI:66d:31u,Benghasi:58u:30d,WCI:70u:34d,Tunisia:60u:28d,UK:145d:70u,CTZ:15d:15u,Ruse:15u:15d";
-        const mockLight = "MRM:38d:36u,ECG:44u:20d,Creta:50u:22d,WCG:52d:24u,Mersin:60u:-,Egypt:62d:-,ECI:62u:29d,Benghasi:52d:26u,WCI:66d:32u,Tunisia:55d:24u,UK:135u:65d,CTZ:15d:15u,Ruse:15u:15d";
+        // Демо-данные по умолчанию
+        const mockHeavy = "CTZ:15u:15d,Ruse:15u:15d,MRM:42u:40d,ECG:48d:22u,Creta:55d:25u,WCG:56u:26d,Mersin:65u:-,Egypt:68d:-,ECI:66d:31u,Benghasi:58u:30d,WCI:70u:34d,Tunisia:60u:28d,UK:145d:70u";
+        const mockLight = "CTZ:15d:15u,Ruse:15u:15d,MRM:38d:36u,ECG:44u:20d,Creta:50u:22d,WCG:52d:24u,Mersin:60u:-,Egypt:62d:-,ECI:62u:29d,Benghasi:52d:26u,WCI:66d:32u,Tunisia:55d:24u,UK:135u:65d";
 
         let currentTab = 'heavy';
         let ratesData = { heavy: [], light: [] };
 
-        // Initialize UI Theme
-        function initTheme() {
-            let savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.body.classList.add('dark');
-                document.getElementById('theme-toggle').innerHTML = '🌙';
-            } else {
-                document.body.classList.remove('dark');
-                document.getElementById('theme-toggle').innerHTML = '☀️';
-            }
-        }
-
-        // Toggle Dark/Light Mode
-        function toggleTheme() {
-            const isDark = document.body.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            document.getElementById('theme-toggle').innerHTML = isDark ? '🌙' : '☀️';
+        // Инициализируем Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
             
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
-                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-            }
+            const root = document.documentElement;
+            if (tg.themeParams.bg_color) root.style.setProperty('--tg-bg', tg.themeParams.bg_color);
+            if (tg.themeParams.secondary_bg_color) root.style.setProperty('--tg-card-bg', tg.themeParams.secondary_bg_color);
+            if (tg.themeParams.text_color) root.style.setProperty('--tg-text', tg.themeParams.text_color);
+            if (tg.themeParams.section_separator_color) root.style.setProperty('--tg-border', tg.themeParams.section_separator_color);
         }
 
-        // Parse query params or fallback
+        // Парсинг переданных тарифов из URL
         function parseUrlData() {
             const params = new URLSearchParams(window.location.search);
             const dateStr = params.get('d') || "09.07_18:00";
-            document.getElementById('date-label').innerText = `Updated: ${dateStr.replace('_', ' at ')}`;
+            
+            document.getElementById('date-label').innerText = `📅 ОБНОВЛЕНО: ${dateStr.replace('_', ' В ')}`;
 
             const heavyRaw = params.get('h') || mockHeavy;
             const lightRaw = params.get('l') || mockLight;
@@ -555,46 +141,41 @@
             ratesData.light = decodeRates(lightRaw);
         }
 
-        // Decode incoming raw ratings
+        // Декодер строки в объекты с покраской трендов!
         function decodeRates(raw) {
-            if (!raw) return [];
             return raw.split(',').map(item => {
                 const parts = item.split(':');
                 const code = parts[0];
-                const r3k = parts[1] || '-';
-                const r6k = parts[2] || '-';
+                const r3 = parts[1] || '-';
+                const r6 = parts[2] || '-';
 
-                const formatCell = (str) => {
-                    if (str === '-' || !str) return { price: '-', trend: '', style: 'rate-empty' };
-                    let val = str;
-                    let trend = '';
-                    let style = 'rate-neutral';
+                // Функция покраски ставки в зависимости от тренда
+                // Если вверх (u) -> Красная (рост цен). Если вниз (d) -> Зеленая (скидка)
+                const formatCell = (valStr) => {
+                    if (valStr === '-' || !valStr) return { price: '—', trend: '', style: 'text-gray-300' };
                     
-                    const lastChar = str.slice(-1);
-                    if (lastChar === 'u' || lastChar === 'd' || lastChar === 'n') {
-                        val = str.slice(0, -1);
-                        if (lastChar === 'u') {
-                            trend = '↑';
-                            style = 'rate-up-red';     /* PRICE UP -> RED */
-                        }
-                        if (lastChar === 'd') {
-                            trend = '↓';
-                            style = 'rate-down-green'; /* PRICE DOWN -> GREEN */
-                        }
+                    const value = valStr.slice(0, -1);
+                    const trendCode = valStr.slice(-1);
+                    
+                    if (trendCode === 'u') {
+                        return { price: `$${value}`, trend: ' 🔺', style: 'text-red-600 bg-red-50/70 border border-red-100 rounded-lg px-2 py-0.5' };
+                    } else if (trendCode === 'd') {
+                        return { price: `$${value}`, trend: ' 🔻', style: 'text-green-600 bg-green-50/70 border border-green-100 rounded-lg px-2 py-0.5' };
                     }
-                    return { price: `$${val}`, trend, style };
+                    return { price: `$${value}`, trend: '', style: 'text-gray-800' };
                 };
 
                 return {
                     code: code,
                     flag: FLAGS[code] ? FLAGS[code].split(' ')[0] : '🌐',
                     name: FLAGS[code] ? FLAGS[code].split(' ')[1] : code,
-                    r3k: formatCell(r3k),
-                    r6k: formatCell(r6k)
+                    r3k: formatCell(r3),
+                    r6k: formatCell(r6)
                 };
             });
         }
 
+        // Отрисовка таблиц
         function renderTable() {
             const seaContainer = document.getElementById('sea-routes-container');
             const bargeContainer = document.getElementById('barge-routes-container');
@@ -603,34 +184,26 @@
             bargeContainer.innerHTML = '';
 
             const filterText = document.getElementById('search-input').value.toLowerCase();
-            const activeRates = ratesData[currentTab];
+            const activeList = ratesData[currentTab];
 
-            activeRates.forEach(item => {
+            activeList.forEach(item => {
                 if (filterText && !item.name.toLowerCase().includes(filterText)) return;
 
                 const isBarge = (item.code === 'CTZ' || item.code === 'Ruse');
                 const targetContainer = isBarge ? bargeContainer : seaContainer;
 
                 const row = document.createElement('div');
-                row.className = "form-row";
-                
+                row.className = "grid grid-cols-12 p-3.5 items-center hover:bg-gray-50/50 transition duration-150";
                 row.innerHTML = `
-                    <div class="col-dest route-cell">
-                        <div class="flag-box">${item.flag}</div>
-                        <div>
-                            <span class="route-title">${item.name}</span>
-                            <span class="route-sub">${item.code}</span>
-                        </div>
+                    <div class="col-span-6 flex items-center gap-2">
+                        <span class="text-lg">${item.flag}</span>
+                        <span class="font-extrabold text-xs tracking-wide">${item.name}</span>
                     </div>
-                    <div class="col-3000">
-                        <span class="badge-rate ${item.r3k.style}">
-                            ${item.r3k.price} <span>${item.r3k.trend}</span>
-                        </span>
+                    <div class="col-span-3 text-center font-black text-sm">
+                        <span class="${item.r3k.style}">${item.r3k.price}<span class="text-[9px]">${item.r3k.trend}</span></span>
                     </div>
-                    <div class="col-5000">
-                        <span class="badge-rate ${item.r6k.style}">
-                            ${item.r6k.price} <span>${item.r6k.trend}</span>
-                        </span>
+                    <div class="col-span-3 text-center font-black text-sm">
+                        <span class="${item.r6k.style}">${item.r6k.price}<span class="text-[9px]">${item.r6k.trend}</span></span>
                     </div>
                 `;
                 targetContainer.appendChild(row);
@@ -643,11 +216,11 @@
             const btnLight = document.getElementById('btn-light');
 
             if (tab === 'heavy') {
-                btnHeavy.className = "tab-button active";
-                btnLight.className = "tab-button";
+                btnHeavy.className = "tab-transition flex-1 py-2.5 text-center rounded-lg font-bold text-xs flex items-center justify-center gap-1 bg-white text-gray-800 shadow-sm";
+                btnLight.className = "tab-transition flex-1 py-2.5 text-center rounded-lg font-bold text-xs flex items-center justify-center gap-1 text-gray-500 hover:text-gray-800";
             } else {
-                btnLight.className = "tab-button active";
-                btnHeavy.className = "tab-button";
+                btnLight.className = "tab-transition flex-1 py-2.5 text-center rounded-lg font-bold text-xs flex items-center justify-center gap-1 bg-white text-gray-800 shadow-sm";
+                btnHeavy.className = "tab-transition flex-1 py-2.5 text-center rounded-lg font-bold text-xs flex items-center justify-center gap-1 text-gray-500 hover:text-gray-800";
             }
 
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
@@ -661,15 +234,16 @@
             renderTable();
         }
 
-        // Export data to raw text in English format
+        // Копирование в буфер
         function copyToClipboardText() {
             let text = `⚡ Freight Rates — Giurgiulești\n`;
-            text += `${currentTab === 'heavy' ? '🚢 HEAVY CARGO' : '🌾 LIGHT CARGO'}\n\n`;
+            text += `${currentTab === 'heavy' ? '🚢 ТЯЖЕЛЫЙ ГРУЗ (Heavy)' : '🌾 ЛЕГКИЙ ГРУЗ (Light)'}\n\n`;
             text += `  Route       3,000t     5-6,000t\n`;
             text += `----------------------------------\n`;
 
             const activeList = ratesData[currentTab];
             
+            // Сначала суда
             activeList.forEach(item => {
                 if (item.code !== 'CTZ' && item.code !== 'Ruse') {
                     const fullName = `${item.flag} ${item.name}`;
@@ -680,9 +254,10 @@
             });
 
             text += `----------------------------------\n`;
-            text += `  Barges (River Terminal)\n`;
+            text += `  Barges (Речные баржи)\n`;
             text += `----------------------------------\n`;
 
+            // Затем баржи
             activeList.forEach(item => {
                 if (item.code === 'CTZ' || item.code === 'Ruse') {
                     const fullName = `${item.flag} ${item.name}`;
@@ -697,30 +272,20 @@
             textarea.style.position = 'fixed';
             document.body.appendChild(textarea);
             textarea.select();
-            
-            try {
-                document.execCommand('copy');
-                showToast();
-            } catch (err) {
-                console.error('Failed to copy rates:', err);
-            }
+            document.execCommand('copy');
             document.body.removeChild(textarea);
-        }
 
-        function showToast() {
             const toast = document.getElementById('toast');
-            toast.style.opacity = '1';
+            toast.className = toast.className.replace('opacity-0 pointer-events-none', 'opacity-100');
             setTimeout(() => {
-                toast.style.opacity = '0';
+                toast.className = toast.className.replace('opacity-100', 'opacity-0 pointer-events-none');
             }, 2000);
         }
 
         window.onload = function() {
-            initTheme();
             parseUrlData();
             renderTable();
         };
     </script>
 </body>
-</html>
 </html>
