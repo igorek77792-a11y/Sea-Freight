@@ -125,7 +125,14 @@
             if (tg.themeParams.secondary_bg_color) root.style.setProperty('--tg-card-bg', tg.themeParams.secondary_bg_color);
             if (tg.themeParams.text_color) root.style.setProperty('--tg-text', tg.themeParams.text_color);
             if (tg.themeParams.section_separator_color) root.style.setProperty('--tg-border', tg.themeParams.section_separator_color);
-        }
+
+            // Тот самый недостающий шаг для Tailwind:
+            // Если в Telegram включена темная тема — добавляем класс dark, иначе — убираем его
+            if (tg.colorScheme === 'dark') {
+                root.classList.add('dark');
+            } else {
+                root.classList.remove('dark');
+            }
 
         // Парсинг переданных тарифов из URL
         function parseUrlData() {
@@ -159,22 +166,26 @@
                     const trendCode = cleanVal.slice(-1);
                     
                     if (trendCode === 'u') {
-                        // Для роста: красный текст и нежная красная подложка, адаптированная под светлую и темную темы
+                        // Для роста: темно-красный текст, плотная розовая подложка с красной границей
                         return { 
                             price: `$${value}`, 
                             trend: ' 🔺', 
-                            style: 'text-red-600 dark:text-red-400 bg-red-50/70 dark:bg-red-950/40 border border-red-100 dark:border-red-900/50 rounded-lg px-2 py-0.5' 
+                            style: 'text-red-800 dark:text-red-200 bg-red-100 dark:bg-red-950 border border-red-300 dark:border-red-800 rounded-lg px-2 py-0.5 font-bold shadow-sm' 
                         };
                     } else if (trendCode === 'd') {
-                        // Для падения: зеленый текст и нежная зеленая подложка под обе темы
+                        // Для падения: глубокий темно-зеленый текст, плотная салатовая подложка с зеленой границей
                         return { 
                             price: `$${value}`, 
                             trend: ' 🔻', 
-                            style: 'text-green-600 dark:text-green-400 bg-green-50/70 dark:bg-green-950/40 border border-green-100 dark:border-green-900/50 rounded-lg px-2 py-0.5' 
+                            style: 'text-green-800 dark:text-green-200 bg-green-100 dark:bg-green-950 border border-green-300 dark:border-green-800 rounded-lg px-2 py-0.5 font-bold shadow-sm' 
                         };
                     }
-                    // Нейтральный цвет, адаптирующийся под тему
-                    return { price: `$${value}`, trend: '', style: 'text-gray-800 dark:text-gray-200' };
+                    // Нейтральная ставка (без изменений) — четкий темно-серый/белый цвет
+                    return { 
+                        price: `$${value}`, 
+                        trend: '', 
+                        style: 'text-gray-900 dark:text-gray-100 font-semibold' 
+                    };
                 };
 
                 return {
