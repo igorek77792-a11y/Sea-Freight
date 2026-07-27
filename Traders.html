@@ -106,15 +106,19 @@
     <script>
         const FLAGS = {
             "CTZ": "🇷🇴 CTZ", "Ruse": "🇧🇬 Ruse", "MRM": "🇹🇷 MRM",
-            "ECG": "🇬🇷 ECG", "Creta": "🇬🇷 Creta", "WCG": "🇬🇷 WCG",
-            "Mersin": "🇹🇷 Mersin", "Egypt": "🇪🇬 Egypt", "ECI": "🇮🇹 ECI",
-            "Benghasi": "🇱🇾 Benghasi", "WCI": "🇮🇹 WCI", "Tunisia": "🇹🇳 Tunisia",
-            "UK": "🇬🇧 UK"
+            "ECG": "🇬🇷 ECG", "WCG": "🇬🇷 WCG", "Creta": "🇬🇷 Creta",
+            "Mersin": "🇹🇷 Mersin", "Larnaca": "🇨🇾 Larnaca", "Egypt": "🇪🇬 Egypt",
+            "ECI": "🇮🇹 ECI", "WCI": "🇮🇹 WCI", "Benghasi": "🇱🇾 Benghasi",
+            "Libya": "🇱🇾 Libya", "Tunisia": "🇹🇳 Tunisia", "UK": "🇬🇧 UK"
         };
 
         // Разделение портов на группы
         const BARGE_PORTS = ["CTZ", "Ruse"];
-        const SEA_PORTS = ["MRM", "ECG", "Creta", "WCG", "Mersin", "Egypt", "ECI", "Benghasi", "WCI", "Tunisia", "UK"];
+        const SEA_PORTS = [
+            "MRM", "ECG", "WCG", "Creta", "Mersin", 
+            "Larnaca", "Egypt", "ECI", "WCI", "Benghasi", 
+            "Libya", "Tunisia", "UK"
+        ];
 
         let currentCargo = "heavy";
         let ratesData = [];
