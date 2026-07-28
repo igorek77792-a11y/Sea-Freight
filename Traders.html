@@ -191,26 +191,34 @@
                     const cleanVal = valStr.trim();
                     if (cleanVal === '-' || !cleanVal) return { price: '—', trend: '', style: 'text-slate-300 dark:text-zinc-700' };
                     
-                    const value = cleanVal.slice(0, -1);
-                    const trendCode = cleanVal.slice(-1);
-                    
-                    if (trendCode === 'u') {
-                        // Рост — красный текст, плотный красный фон (хорошо читается)
+                    // Парсим цену и дельту (например, "18+2", "16-3", "20u", "20n")
+                    const match = cleanVal.match(/^(\d+)([+-]\d+|u|d|n)$/);
+                    if (!match) {
+                        return { price: `$${cleanVal}`, trend: '', style: 'text-slate-800 dark:text-zinc-200 font-semibold' };
+                    }
+
+                    const priceVal = match[1];
+                    const trendVal = match[2];
+
+                    if (trendVal.startsWith('+') || trendVal === 'u') {
+                        // Рост — красный текст и красный фоновый бейдж
+                        const badgeText = trendVal.startsWith('+') ? `+${trendVal.slice(1)}` : '';
                         return { 
-                            price: `$${value}`, 
-                            trend: ' 🔺', 
-                            style: 'text-red-700 dark:text-red-300 bg-red-100/90 dark:bg-red-950/70 border border-red-200 dark:border-red-900 rounded-lg px-2 py-0.5 font-bold' 
+                            price: `$${priceVal}`, 
+                            trend: ` ${badgeText} 🔺`, 
+                            style: 'text-red-700 dark:text-red-300 bg-red-100/90 dark:bg-red-950/70 border border-red-200 dark:border-red-900 rounded-lg px-2 py-0.5 font-bold text-xs inline-block' 
                         };
-                    } else if (trendCode === 'd') {
-                        // Падение — зеленый текст, плотный зеленый фон
+                    } else if (trendVal.startsWith('-') || trendVal === 'd') {
+                        // Падение — зеленый текст и зеленый фоновый бейдж
                         return { 
-                            price: `$${value}`, 
-                            trend: ' 🔻', 
-                            style: 'text-green-700 dark:text-green-300 bg-green-100/90 dark:bg-green-950/70 border border-green-200 dark:border-green-900 rounded-lg px-2 py-0.5 font-bold' 
+                            price: `$${priceVal}`, 
+                            trend: ` ${trendVal} 🔻`, 
+                            style: 'text-green-700 dark:text-green-300 bg-green-100/90 dark:bg-green-950/70 border border-green-200 dark:border-green-900 rounded-lg px-2 py-0.5 font-bold text-xs inline-block' 
                         };
                     }
+
                     // Без изменений — стандартный темный/светлый текст
-                    return { price: `$${value}`, trend: '', style: 'text-slate-800 dark:text-zinc-200 font-semibold' };
+                    return { price: `$${priceVal}`, trend: '', style: 'text-slate-800 dark:text-zinc-200 font-semibold' };
                 };
 
                 return {
