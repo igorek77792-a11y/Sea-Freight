@@ -189,36 +189,39 @@
 
                 const formatCell = (valStr) => {
                     const cleanVal = valStr.trim();
-                    if (cleanVal === '-' || !cleanVal) return { price: '—', trend: '', style: 'text-slate-300 dark:text-zinc-700' };
+                    if (cleanVal === '-' || !cleanVal) return { price: '—', trend: '', style: '' };
                     
                     // Парсим цену и дельту (например, "18+2", "16-3", "20u", "20n")
                     const match = cleanVal.match(/^(\d+)([+-]\d+|u|d|n)$/);
                     if (!match) {
-                        return { price: `$${cleanVal}`, trend: '', style: 'text-slate-800 dark:text-zinc-200 font-semibold' };
+                        return { price: `<span class="font-bold text-slate-900 dark:text-zinc-100">$${cleanVal}</span>`, trend: '', style: '' };
                     }
 
                     const priceVal = match[1];
                     const trendVal = match[2];
 
+                    // Крупная чистая цена без фона
+                    const mainPriceHtml = `<span class="font-bold text-slate-900 dark:text-zinc-100">$${priceVal}</span>`;
+
                     if (trendVal.startsWith('+') || trendVal === 'u') {
-                        // Рост — красный текст и красный фоновый бейдж
-                        const badgeText = trendVal.startsWith('+') ? `+${trendVal.slice(1)}` : '';
+                        // Рост — красный значок отдельным блоком
+                        const deltaText = trendVal.startsWith('+') ? `+${trendVal.slice(1)}` : '';
                         return { 
-                            price: `$${priceVal}`, 
-                            trend: ` ${badgeText} 🔺`, 
-                            style: 'text-red-700 dark:text-red-300 bg-red-100/90 dark:bg-red-950/70 border border-red-200 dark:border-red-900 rounded-lg px-2 py-0.5 font-bold text-xs inline-block' 
+                            price: mainPriceHtml, 
+                            trend: `<span class="ml-1.5 text-[11px] font-extrabold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/70 border border-red-200/80 dark:border-red-900/60 rounded-md px-1.5 py-0.5 inline-flex items-center gap-0.5">${deltaText} 🔺</span>`, 
+                            style: 'inline-flex items-center justify-end' 
                         };
                     } else if (trendVal.startsWith('-') || trendVal === 'd') {
-                        // Падение — зеленый текст и зеленый фоновый бейдж
+                        // Падение — зеленый значок отдельным блоком
                         return { 
-                            price: `$${priceVal}`, 
-                            trend: ` ${trendVal} 🔻`, 
-                            style: 'text-green-700 dark:text-green-300 bg-green-100/90 dark:bg-green-950/70 border border-green-200 dark:border-green-900 rounded-lg px-2 py-0.5 font-bold text-xs inline-block' 
+                            price: mainPriceHtml, 
+                            trend: `<span class="ml-1.5 text-[11px] font-extrabold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/70 border border-green-200/80 dark:border-green-900/60 rounded-md px-1.5 py-0.5 inline-flex items-center gap-0.5">${trendVal} 🔻</span>`, 
+                            style: 'inline-flex items-center justify-end' 
                         };
                     }
 
-                    // Без изменений — стандартный темный/светлый текст
-                    return { price: `$${priceVal}`, trend: '', style: 'text-slate-800 dark:text-zinc-200 font-semibold' };
+                    // Без изменений
+                    return { price: mainPriceHtml, trend: '', style: 'inline-flex items-center justify-end' };
                 };
 
                 return {
@@ -251,10 +254,10 @@
                         <span class="mr-1.5">${item.flag}</span>${item.name}
                     </td>
                     <td class="py-3 text-right">
-                        <span class="${currentRates.r3k.style}">${currentRates.r3k.price}${currentRates.r3k.trend}</span>
+                        <div class="${currentRates.r3k.style}">${currentRates.r3k.price}${currentRates.r3k.trend}</div>
                     </td>
                     <td class="py-3 text-right">
-                        <span class="${currentRates.r6k.style}">${currentRates.r6k.price}${currentRates.r6k.trend}</span>
+                        <div class="${currentRates.r6k.style}">${currentRates.r6k.price}${currentRates.r6k.trend}</div>
                     </td>
                 `;
 
@@ -296,8 +299,16 @@
 
             ratesData.forEach(item => {
                 const currentRates = item[currentCargo];
-                const r3 = currentRates.r3k.price !== '—' ? `${currentRates.r3k.price}${currentRates.r3k.trend}` : '—';
-                const r6 = currentRates.r6k.price !== '—' ? `${currentRates.r6k.price}${currentRates.r6k.trend}` : '—';
+                
+                // Функция для очистки HTML тэгов при копировании
+                const cleanText = (htmlStr) => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = htmlStr;
+                    return temp.textContent || temp.innerText || '—';
+                };
+
+                const r3 = currentRates.r3k.price !== '—' ? `${cleanText(currentRates.r3k.price)}${cleanText(currentRates.r3k.trend)}` : '—';
+                const r6 = currentRates.r6k.price !== '—' ? `${cleanText(currentRates.r6k.price)}${cleanText(currentRates.r6k.trend)}` : '—';
                 
                 text += `${item.flag} ${item.name}: 3kт = ${r3} | 5-6kт = ${r6}\n`;
             });
